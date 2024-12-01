@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Résumer une Rencontre Pingpong</title>
+  </head>
+  <body>
+    <h1>Résumé de Rencontre Pingpong</h1>
+    <p>Chargez un fichier XML pour générer un résumé.</p>
+    <input type="file" id="xmlFileInput" accept=".xml" />
+    <div id="output" style="margin-top: 20px; white-space: pre-wrap"></div>
+    <script type="module">
+      export class Match {
+        constructor(team, player, match, otherPlayersDict) {
+          this.initTeamAndPlayer(team, player);
+          this.initOtherPlayer(match, otherPlayersDict);
+          this.calculatePointsDifference();
+          this.determineWin(match);
+          this.assignTagsByDiff();
+          this.extractSets(match);
+        }
+
+        initTeamAndPlayer(team, player) {
+          this.team = JSON.parse(JSON.stringify(team));
+          this.player = JSON.parse(JSON.stringify(player));
+          delete this.player["matchs"];
+
+          Object.keys(this.team).forEach((key) => {
+            if (key.includes("joueur")) {
+              delete this.team[key];
+            }
+          });
+
+          this.teamLetter = this.team["team_letter"];
+          this.playerLetter = this.player["letter"];
+          this.playerPoints = parseInt(
+            this.player["pointsclassementsjoueur"],
+            10
+          );
+        }
+
+        initOtherPlayer(match, otherPlayersDict) {
+          const keyOtherPlayer =
+            this.teamLetter === "a" ? "lettrex" : "lettrea";
+          this.otherPlayerLetter = match[keyOtherPlayer].toLowerCase();
+          this.otherPlayer = otherPlayersDict[this.otherPlayerLetter];
+          this.otherPlayerPoints = parseInt(
+            this.otherPlayer["pointsclassementsjoueur"],
+            10
+          );
+        }
+
+        calculatePointsDifference() {
+          this.diffPoints = this.playerPoints - this.otherPlayerPoints;
+        }
+
+        determineWin(match) {
+          this.teamLetterWin = match["pointsa"] === "2" ? "a" : "x";
+          this.win = this.teamLetter === this.teamLetterWin;
+        }
+
+        assignTagsByDiff() {
+          this.tags = this.getTagsByDiff(this.diffPoints, this.win);
+        }
+
+        extractSets(match) {
+          this.sets = [];
+          this.setNumber = 0;
+          this.setWinNumber = 0;
+          for (let n = 1; n <= 7; n++) {
+            const value = match[`manche${n}`] || false;
+            if (value) {
+              this.setNumber++;
+              const minus = value[0] === "-";
+              const win = this.teamLetter === "a" && !minus;
+              this.sets.push({
+                score: Math.abs(parseInt(value, 10)),
+                minus,
+                win,
+              });
+              if (win) this.setWinNumber++;
+            }
+          }
+          if (this.setNumber === 5) {
+            this.tags.push("match tendu");
+          }
+        }
+
+        getSummary() {
+          const result = this.win ? "victoire" : "défaite";
+          const setStr = this.setWinNumber > 1 ? "sets gagnés" : "set gagné";
+          return `vs ${this.otherPlayer["prenomjoueur"][0]}. ${
+            this.otherPlayer["nomjoueur"]
+          }: ${result} avec ${this.setWinNumber} ${setStr} (${this.tags.join(
+            ","
+          )})`;
+        }
+
+        getTagsByDiff(diff, win) {
+          const tags = [];
+          if (win) {
+            if (diff > 0) {
+              tags.push(
+                diff < 100
+                  ? "victoire normale"
+                  : diff < 200
+                  ? "victoire évidente"
+                  : "victoire inévitable"
+              );
+            } else {
+              tags.push(
+                "anormal",
+                diff > -100 ? "belle victoire" : "performance incroyable"
+              );
+            }
+          } else {
+            if (diff < 0) {
+              tags.push(
+                diff > -100
+                  ? "défaite normale"
+                  : diff < -200
+                  ? "défaite inévitable"
+                  : "défaite évidente"
+              );
+            } else {
+              tags.push(
+                "anormal",
+                diff < 100 ? "triste défaite" : "contre performance incroyable"
+              );
+            }
+          }
+          return tags;
+        }
+      }
+
+      export class Encounter {
+        constructor(
+          sheetObject,
+          substrNomclub,
+          numeroequipe,
+          usePlayerCat = false
+        ) {
+          this.sheetObject = sheetObject;
+          this.substrNomclub = substrNomclub;
+          this.numeroequipe = String(numeroequipe);
+          this.usePlayerCat = usePlayerCat;
+          this.rectoDict = sheetObject.liste.recto;
+          this.metas = this.rectoDict.typefeuille;
+          this.matchs = this.rectoDict.parties;
+          this.initializeTeams();
+        }
+
+        initializeTeams() {
+          const { myTeam, otherTeam } = this.getTeams();
+          this.myTeam = myTeam;
+          this.otherTeam = otherTeam;
+          this.mapPlayersToLetters();
+          this.populatePlayersDicts();
+        }
+
+        mapPlayersToLetters() {
+          this.letterByName = {};
+          for (let n = 1; n <= 4; n++) {
+            const match = this.matchs[`partie${n}`];
+            this.letterByName[match.joueura] = match.lettrea.toLowerCase();
+            this.letterByName[match.joueurx] = match.lettrex.toLowerCase();
+          }
+        }
+
+        populatePlayersDicts() {
+          this.myPlayers = this.getPlayers(this.myTeam);
+          this.otherPlayers = this.getPlayers(this.otherTeam);
+          this.myPlayersDict = this.createPlayersDict(this.myPlayers);
+          this.otherPlayersDict = this.createPlayersDict(this.otherPlayers);
+          this.assignMatchesToPlayers();
+        }
+
+        createPlayersDict(players) {
+          return players.reduce((acc, player) => {
+            acc[player.letter] = { ...player, matchs: [] };
+            return acc;
+          }, {});
+        }
+
+        assignMatchesToPlayers() {
+          for (const match of Object.values(this.matchs)) {
+            if (match.lettrea.length !== 1) continue;
+            const teamLetter = this.myTeam.teamLetter.toLowerCase();
+            const matchLetter = match[`lettre${teamLetter}`].toLowerCase();
+            this.myPlayersDict[matchLetter].matchs.push(match);
+          }
+        }
+        getPlayerDetails(player) {
+          const matchs = player.matchs;
+          const matchSummaries = [];
+          let matchWinNumber = 0;
+          let matchPlayedNumber = 0;
+
+          for (const match of matchs) {
+            const matchInstance = new Match(
+              this.myTeam,
+              player,
+              match,
+              this.otherPlayersDict
+            );
+            if (matchInstance.win) matchWinNumber++;
+            matchPlayedNumber++;
+            if (!matchInstance.tags.includes("normal")) {
+              matchSummaries.push(matchInstance.getSummary());
+            }
+          }
+          return { matchSummaries, matchWinNumber, matchPlayedNumber };
+        }
+
+        getPlayersDetails() {
+          return Object.values(this.myPlayersDict)
+            .map((player) => {
+              const { matchSummaries, matchWinNumber, matchPlayedNumber } =
+                this.getPlayerDetails(player);
+              return `- ${player.nomjoueur} ${
+                player.prenomjoueur
+              } (${matchWinNumber}/${matchPlayedNumber}): ${matchSummaries.join(
+                " | "
+              )}`;
+            })
+            .join("\n");
+        }
+
+        getSummary() {
+          const playersSummary = this.getPlayersSummary();
+          const playersDetails = this.getPlayersDetails();
+          return `#### Rencontre matchs par équipe: ${
+            this.metas.onglet
+          } ####\n${playersSummary.trim()}\n\n${playersDetails.trim()}`;
+        }
+
+        getPlayerSummary(player, usePlayerCat = true) {
+          const points = parseInt(player.pointsclassementsjoueur, 10);
+          const lastname = player.nomjoueur;
+          const firstname = player.prenomjoueur;
+          const cat = player.categoriejoueur;
+          let text = `Classement:${points} ${lastname} ${firstname}`;
+          if (usePlayerCat) {
+            text += ` (Catégorie:${cat})`;
+          }
+          return { text, points };
+        }
+
+        getPlayersSummaryByTeam(teamPlayers, usePlayerCat = true) {
+          let totalPoints = 0;
+          const playersTextList = teamPlayers.map((player) => {
+            const { text, points } = this.getPlayerSummary(
+              player,
+              usePlayerCat
+            );
+            totalPoints += points;
+            return text;
+          });
+          return { playersTextList, totalPoints };
+        }
+
+        getPlayersSummary() {
+          const {
+            playersTextList: myPlayersTxts,
+            totalPoints: myPlayersTotalPoints,
+          } = this.getPlayersSummaryByTeam(this.myPlayers, this.usePlayerCat);
+          const {
+            playersTextList: otherPlayersTxts,
+            totalPoints: otherPlayersTotalPoints,
+          } = this.getPlayersSummaryByTeam(this.otherPlayers);
+          return `> Notre équipe avec un total de classement de ${myPlayersTotalPoints}:\n  ${myPlayersTxts.join(
+            ", "
+          )}\n> Equipe adverse avec un total de classement de ${otherPlayersTotalPoints}:\n  ${otherPlayersTxts.join(
+            ", "
+          )}`;
+        }
+
+        getPlayers(team) {
+          return Object.keys(team).reduce((players, key) => {
+            if (key.startsWith("joueur") && typeof team[key] === "object") {
+              const playerFullName = `${team[key].nomjoueur} ${team[key].prenomjoueur}`;
+              players.push({
+                letter: this.letterByName[playerFullName],
+                ...team[key],
+              });
+            }
+            return players;
+          }, []);
+        }
+
+        getTeams() {
+          const teamA = this.rectoDict.equipea;
+          const teamX = this.rectoDict.equipex;
+          const clubNameA = teamA.nomclub;
+          const clubNameX = teamX.nomclub;
+
+          if (clubNameA === clubNameX) {
+            throw new Error(
+              "Erreur: Les deux équipes ont le même club, cas non géré."
+            );
+          } else {
+            if (this.substrNomclub.toLowerCase() === clubNameA.toLowerCase()) {
+              return {
+                myTeam: { teamLetter: "a", ...teamA },
+                otherTeam: { key: "equipex", ...teamX },
+              };
+            } else {
+              return {
+                myTeam: { teamLetter: "x", ...teamX },
+                otherTeam: { key: "equipea", ...teamA },
+              };
+            }
+          }
+        }
+      }
+
+      // Prompt constant
+      const prompt = `
+Fait un beau résumé de rencontre par équipe de pingpong avec ces informations sur les équipes et matchs.
+#### Information à ne pas reprendre dans le résumé mais à prendre en considération: 
+Sache que le classement d'un joueur de ping-pong commence à 500 et on arrive dans les meilleurs 1000 français à partir de 2000.
+A chaque match de compétition on gagne ou on perd des points en fonction de si on gagne ou perd les matchs. Le montant du gain dépend de la différence de classement.
+Si on gagne un joueur qui a à peu près le même nombre de points que nous, on va gagner très peu de points dans le classement.
+Si on gagne un joueur qui est beaucoup mieux classé que nous de 200 points par exemple alors on va gagner beaucoup de points dans le classement, environ 25 points.
+Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joueur perdant va perdre beaucoup de points dans son classement.
+
+# Informations à résumer:
+
+
+`;
+
+      document
+        .getElementById("xmlFileInput")
+        .addEventListener("change", function async (event) {
+          const file = event.target.files[0];
+          if (!file) {
+            return;
+          }
+          const reader = new FileReader();
+          reader.onload = function async(e) {
+            const text = e.target.result;
+            // const decoder = new TextDecoder('windows-1252'); // To handle ANSI encoding
+            // const decodedText = decoder.decode(new TextEncoder().encode(text));
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(text, "application/xml");
+            const jsObject = xmlToJson(xmlDoc);
+            console.log("jsObject", jsObject)
+            
+            const encounter = new Encounter(jsObject, "boulogne", 9);
+            const summary = encounter.getSummary();
+
+            // Display the result
+            document.getElementById("output").textContent = prompt + summary;
+
+            // document.getElementById("output").textContent = JSON.stringify(
+            //   jsObject,
+            //   null,
+            //   2
+            // );
+          };
+          reader.readAsText(file, "windows-1252");
+        });
+
+      function xmlToJson(xml) {
+        let obj = {};
+        if (xml.nodeType === 1) {
+          // element node
+          if (xml.attributes.length > 0) {
+            obj = {};
+            for (let j = 0; j < xml.attributes.length; j++) {
+              const attribute = xml.attributes.item(j);
+              obj[attribute.nodeName.toLowerCase()] = attribute.nodeValue;
+            }
+          }
+        } else if (xml.nodeType === 3) {
+          // text node
+          if (xml.nodeValue.trim()) {
+            return xml.nodeValue.trim();
+          }
+        }
+        if (xml.hasChildNodes()) {
+          for (let i = 0; i < xml.childNodes.length; i++) {
+            const item = xml.childNodes.item(i);
+            const nodeName = item.nodeName.toLowerCase();
+            const nodeValue = xmlToJson(item);
+            if (nodeValue !== undefined && nodeValue !== "") {
+              if (typeof obj[nodeName] === "undefined") {
+                obj[nodeName] = nodeValue;
+              } else {
+                if (!Array.isArray(obj[nodeName])) {
+                  obj[nodeName] = [obj[nodeName]];
+                }
+                obj[nodeName].push(nodeValue);
+              }
+            }
+          }
+        }
+        // If the object has only a single text node, replace it with that text
+        if (Object.keys(obj).length === 1 && "#text" in obj) {
+          return obj["#text"];
+        }
+        return obj;
+      }
+    </script>
+  </body>
+</html>
