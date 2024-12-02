@@ -3,13 +3,46 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Résumer une Rencontre Pingpong</title>
+    <title>Résumer une feuille de match XML d'une rencontre par équipe</title>
   </head>
   <body>
-    <!--h1>Résumé de Rencontre Pingpong</h1-->
-    <p>Chargez un fichier XML pour générer un résumé.</p>
-    <input type="file" id="xmlFileInput" accept=".xml" />
+    <h1>Résumer une feuille de match XML d'une rencontre par équipe</h1>
+    <p>Dans le logicial GIRPE, à la fin d'une rencontre par équipe. Envoyez vous la feuille de match au format XML</p>
+    <p>Ensuite téléchargez le fichier sur votre ordinateur.</p>
+    <p>Puis:</p>
+    <p><ul>Dans le formulaire ci-dessous sélectionnez le fichier.
+      <li>Ecrivez une partie du nom de votre team (exemple si Boulogne-Billancourt ACBB, notez boulogne, ou boul) du moment que ça peut identifier le nom de l'équipe c'est bon</li>
+      <li>Entrez ensuite le numéro de votre équipe</li>
+      <li>Sélectionnez le fichier XML</li>
+      <li>Validez le formulaire</li>
+    </ul>
+    </p>
+    <p>
+      <label>Tapez une partie du nom de votre team pour l'identifier entre les 2</label>
+      <input type="text" id="team-name-substr" value="boulogne"/>
+    </p>
+    <p>
+      <label>Entrez le numéro de votre équipe</label>
+      <input type="text" id="team-number" value="9" />
+    </p>
+    <p>
+      <label>Sélectionnez le fichier XML</label>
+      <input type="file" id="xml-file-input" accept=".xml" />
+    </p>
+    <p>
+      <button type="text" id="send"
+      style="color:chartreuse;background-color: black; padding: 20px; margin: 20px; width: 300px;text-align: center;border-radius: 10px;"
+      >Envoyer</button>
+    </p>
+    
     <div id="output" style="margin-top: 20px; white-space: pre-wrap"></div>
+
+    <p>
+      <button type="text" id="send-test">Tester avec le XML ci-dessous</button>
+    </p>
+    <div id="xml-test" style="margin-top: 20px; white-space: pre-wrap"></div>
+
+    </div>
     <script type="module">
       export class Match {
         constructor(team, player, match, otherPlayersDict) {
@@ -19,6 +52,10 @@
           this.determineWin(match);
           this.assignTagsByDiff();
           this.extractSets(match);
+          this.teamLetterWin = match["pointsa"] === "2" ? "a" : "x";
+
+          console.log("Match init - this.teamLetterWin", this.teamLetterWin);
+          console.log("Match init - this.win", this.win);
         }
 
         initTeamAndPlayer(team, player) {
@@ -31,12 +68,18 @@
               delete this.team[key];
             }
           });
-
-          this.teamLetter = this.team["team_letter"];
+          this.teamLetter = this.team["teamLetter"];
           this.playerLetter = this.player["letter"];
           this.playerPoints = parseInt(
             this.player["pointsclassementsjoueur"],
             10
+          );
+          console.log("initTeamAndPlayer this.team", this.team);
+          console.log("initTeamAndPlayer this.player ", this.player);
+          console.log("initTeamAndPlayer this.teamLetter ", this.teamLetter);
+          console.log(
+            "initTeamAndPlayer this.playerLetter ",
+            this.playerLetter
           );
         }
 
@@ -59,10 +102,10 @@
           );
           this.otherPlayer = otherPlayersDict[this.otherPlayerLetter];
           console.log("initOtherPlayer this.otherPlayer", this.otherPlayer);
-          // this.otherPlayerPoints = parseInt(
-          //   this.otherPlayer["pointsclassementsjoueur"],
-          //   10
-          // );
+          this.otherPlayerPoints = parseInt(
+            this.otherPlayer["pointsclassementsjoueur"],
+            10
+          );
         }
 
         calculatePointsDifference() {
@@ -84,7 +127,15 @@
           this.setWinNumber = 0;
           for (let n = 1; n <= 7; n++) {
             const value = match[`manche${n}`] || false;
-            if (value) {
+
+            if (value && typeof value != "object" && value != NaN) {
+              console.log(
+                "  set value",
+                value,
+                typeof value,
+                Math.abs(parseInt(value, 10))
+              );
+              console.log(this.teamLetter, value[0] === "-");
               this.setNumber++;
               const minus = value[0] === "-";
               const win = this.teamLetter === "a" && !minus;
@@ -99,15 +150,31 @@
           if (this.setNumber === 5) {
             this.tags.push("match tendu");
           }
+          console.log("extractSets");
+          console.log("  this.sets", this.sets);
+          console.log("  this.setNumber", this.setNumber);
+          console.log("  this.setWinNumber", this.setWinNumber);
         }
 
         getSummary() {
           const result = this.win ? "victoire" : "défaite";
           const setStr = this.setWinNumber > 1 ? "sets gagnés" : "set gagné";
-          return `vs ${this.otherPlayer["prenomjoueur"][0]}. ${
-            this.otherPlayer["nomjoueur"]
-          }: ${result} avec ${this.setWinNumber} ${setStr} (${this.tags.join(
-            ","
+          // return `vs ${this.otherPlayer["prenomjoueur"][0]}. ${
+          //   this.otherPlayer["nomjoueur"]
+          // }: ${result} avec ${this.setWinNumber} ${setStr} (${this.tags.join(
+          //   ","
+          // )})`;
+          const hashtags = this.tags.map((str) => {
+            return `#${str
+              .toLowerCase()
+              .split(" ") // Split the string into words
+              .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize each word
+              .join("")}`; // Join the words without spaces
+          });
+          return `VS ${this.otherPlayer["prenomjoueur"]} ${
+            this.otherPlayer["pointsclassementsjoueur"]
+          }: ${result} avec ${this.setWinNumber} ${setStr} (${hashtags.join(
+            " "
           )})`;
         }
 
@@ -238,9 +305,12 @@
             .map((player) => {
               const { matchSummaries, matchWinNumber, matchPlayedNumber } =
                 this.getPlayerDetails(player);
-              return `- ${player.nomjoueur} ${
-                player.prenomjoueur
-              } (${matchWinNumber}/${matchPlayedNumber}): ${matchSummaries.join(
+              // return `- ${player.nomjoueur} ${
+              //   player.prenomjoueur
+              // } (${matchWinNumber}/${matchPlayedNumber}): ${matchSummaries.join(
+              //   " | "
+              // )}`;
+              return `- ${player.prenomjoueur} ${player.pointsclassementsjoueur} (${matchWinNumber}/${matchPlayedNumber}): ${matchSummaries.join(
                 " | "
               )}`;
             })
@@ -360,6 +430,17 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
         const jsObject = xmlToJson(xmlDoc);
         console.log("jsObject", jsObject);
 
+        const teamNameSubstr = document.getElementById("team-name-substr").value.trim();
+        const teamNumber = document.getElementById("team-number").value.trim();
+        if(teamNameSubstr == ""){
+          alert("Erreur. Champ vide. Veuillez entrez la chaine de caractère pour identifier votre nom d'équipe");
+          return;
+        }
+        if(teamNameSubstr == ""){
+          alert("Erreur. Champ vide. Veuillez entrez la chaine de caractère pour identifier votre nom d'équipe");
+          return;
+        }
+
         const encounter = new Encounter(jsObject, "boulogne", 9);
         const summary = encounter.getSummary();
 
@@ -374,10 +455,12 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
       }
 
       document
-        .getElementById("xmlFileInput")
-        .addEventListener("change", function async(event) {
-          const file = event.target.files[0];
+        .getElementById("send")
+        .addEventListener("click", function async(event) {
+          //const file = event.target.files[0];
+          const file = document.getElementById("xml-file-input").files[0]
           if (!file) {
+            alert("Erreur. Champ vide. Veuillez sélectionner le fichier XML de la rencontre.");
             return;
           }
           const reader = new FileReader();
@@ -402,9 +485,17 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
       // Call the simulation function during development
       //loadDevelopmentFile();
 
+      document
+        .getElementById("send-test")
+        .addEventListener("click", function async(event) {
+          document.getElementById("team-name-substr").value = "boulogne"
+          document.getElementById("team-number").value = "9"
+          processInputXMLFileContent(xmlContent);
+        });
+
       document.addEventListener("DOMContentLoaded", () => {
         // while dev/testing
-        processInputXMLFileContent(xmlContent);
+        document.getElementById("xml-test").textContent = xmlContent;
       });
 
       function xmlToJson(xml) {
@@ -452,7 +543,7 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
     <recto>
         <typeFeuille>
             <IDFEUILLE>3</IDFEUILLE>
-            <ONGLET>BOULOGNE BILLAN 9 / MEUDON AS</ONGLET>
+            <ONGLET>BOULOGNE BILLAN 9 / Trifouillis-les-Oies</ONGLET>
             <NUMEROJOURNEE>6</NUMEROJOURNEE>
             <LETTRECLUBRECEVANT>A</LETTRECLUBRECEVANT>
             <ARBITRAGEPARTAGE>0</ARBITRAGEPARTAGE>
@@ -467,14 +558,14 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
             <EXPORTMAILJA>1</EXPORTMAILJA>
             <NUMEROLICENCEJA>9247186</NUMEROLICENCEJA>
             <NUMEROCLUBJA>08920067</NUMEROCLUBJA>
-            <NOMCLUBJA>MEUDON AS</NOMCLUBJA>
+            <NOMCLUBJA>Trifouillis-les-Oies</NOMCLUBJA>
             <LIEURENCONTRE>BOULOGNE BILLANCOURT</LIEURENCONTRE>
             <LIGUERENCONTRE>HAUTS DE SEINE</LIGUERENCONTRE>
             <DATERENCONTRE>29/11/2024</DATERENCONTRE>
             <HEURERENCONTRE>20H30</HEURERENCONTRE>
             <DIVISIONRENCONTRE>D1MP1</DIVISIONRENCONTRE>
             <POULERENCONTRE>5</POULERENCONTRE>
-            <NIVEAURENCONTRE>D�partemental</NIVEAURENCONTRE>
+            <NIVEAURENCONTRE>Départemental</NIVEAURENCONTRE>
             <GENRERENCONTRE>Masculin</GENRERENCONTRE>
             <PHASE>1</PHASE>
             <TITREGENERAL>Championnat par Equipes</TITREGENERAL>
@@ -565,7 +656,7 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
         </equipeA>
         <equipeX>
             <NUMEROCLUB>08920067</NUMEROCLUB>
-            <NOMCLUB>MEUDON AS</NOMCLUB>
+            <NOMCLUB>Trifouillis-les-Oies</NOMCLUB>
             <NUMEROENTENTE></NUMEROENTENTE>
             <NOMENTENTE></NOMENTENTE>
             <NUMEROEQUIPE>3</NUMEROEQUIPE>
