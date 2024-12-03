@@ -4,46 +4,221 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Résumer une feuille de match XML d'une rencontre par équipe</title>
+    <style>
+      .hide {
+        display: none;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background-color: #f8f9fa;
+      }
+
+      h1 {
+        color: #333;
+        text-align: center;
+      }
+
+      p {
+        color: #555;
+        text-align: left;
+      }
+
+      .load-file-container {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 20px;
+      }
+
+      .load-local-file-container,
+      .load-test-file-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      label {
+        font-size: 1.2em;
+        color: #444;
+        margin-bottom: 10px;
+      }
+
+      #xml-file-input {
+        padding: 10px;
+        font-size: 1em;
+        border: 2px solid #ccc;
+        border-radius: 5px;
+      }
+
+      .load-file-container button,
+      label#xml-file-input-label {
+        padding: 15px 30px;
+        font-size: 1.2em;
+        font-weight: bold;
+        color: #fff;
+        background-color: #007bff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: background-color 0.3s, transform 0.2s;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      button:active {
+        transform: scale(0.98);
+      }
+
+      #xml-test {
+        text-align: left;
+        color: #333;
+        border: 1px dashed #ccc;
+        padding: 20px;
+        border-radius: 5px;
+        background-color: #fff;
+        margin-top: 20px;
+      }
+
+      /******************
+*** POPIN COMMON ***
+******************/
+
+      #popin-container {
+        position: fixed;
+        margin: 0;
+        padding: 0;
+        z-index: 1000;
+        top: 0px;
+        left: 0px;
+        width: 100vw;
+        height: 100vw;
+        background-color: rgba(255, 255, 255, 0.7);
+      }
+      #popin {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        min-width: 40vw;
+        max-width: 80vw;
+        min-height: 20vh;
+        max-height: 80vh;
+        border: 1px solid rgba(207, 226, 255, 1);
+        background-color: rgba(245, 250, 255, 1);
+        padding: 5px;
+        display: flex;
+        flex-direction: column;
+        border-radius: 5px;
+      }
+      #popin * {
+        font-family: Verdana, Geneva, sans-serif;
+      }
+      #popin-header {
+        display: flex;
+        width: 100%;
+        font-size: 1.1em;
+        font-weight: 600;
+      }
+      #popin-title {
+        display: block;
+        text-align: center;
+        width: calc(100% - 30px);
+        padding: 5px;
+        border: 1px solid rgba(207, 226, 255, 1);
+        background-color: rgba(207, 226, 255, 0.1);
+        margin-right: 5px;
+        border-radius: 3px;
+      }
+      #popin-close {
+        display: block;
+        width: 30px;
+        padding: 5px;
+        margin-left: auto;
+        text-align: center;
+        border: 1px solid rgba(207, 226, 255, 1);
+        background-color: rgba(207, 226, 255, 0.7);
+        border-radius: 3px;
+      }
+      #popin-close:hover {
+        cursor: pointer;
+        padding: 5px;
+      }
+      #popin-content {
+        padding: 5px;
+        margin-top: 5px;
+        border: 1px solid rgba(207, 226, 255, 1);
+        background-color: rgba(207, 226, 255, 0.1);
+        overflow-y: scroll;
+        overflow-wrap: break-word;
+        flex: auto;
+        border-radius: 3px;
+      }
+
+      /******************
+*** POPIN CUSTOM ***/
+
+      #popin-select-team-container {
+        width: 800px;
+        text-align: center; /* Centre tout le contenu */
+        padding: 20px;
+        font-family: Arial, sans-serif;
+      }
+
+      .select-team-form {
+        display: flex; /* Affiche les boutons côte à côte */
+        justify-content: center; /* Centre les boutons horizontalement */
+        gap: 20px; /* Ajoute un espacement entre les boutons */
+      }
+
+      .select-team-btn {
+        width: 45%;
+        font-size: 18px; /* Texte plus grand */
+        padding: 10px 20px; /* Agrandit les boutons */
+        background-color: #007bff; /* Couleur de fond */
+        color: white; /* Texte blanc */
+        border: none; /* Supprime les bordures par défaut */
+        border-radius: 5px; /* Coins arrondis */
+        cursor: pointer; /* Change le curseur au survol */
+        transition: background-color 0.3s ease; /* Animation fluide */
+      }
+
+      .select-team-btn:hover {
+        background-color: #0056b3; /* Change la couleur au survol */
+      }
+    </style>
   </head>
   <body>
     <h1>Résumer une feuille de match XML d'une rencontre par équipe</h1>
-    <p>Dans le logicial GIRPE, à la fin d'une rencontre par équipe. Envoyez vous la feuille de match au format XML</p>
+    <p>
+      Dans le logicial GIRPE, à la fin d'une rencontre par équipe. Envoyez-vous
+      par email la feuille de match au format XML.
+    </p>
     <p>Ensuite téléchargez le fichier sur votre ordinateur.</p>
-    <p>Puis:</p>
-    <p><ul>Dans le formulaire ci-dessous sélectionnez le fichier.
-      <li>Ecrivez une partie du nom de votre team (exemple si Boulogne-Billancourt ACBB, notez boulogne, ou boul) du moment que ça peut identifier le nom de l'équipe c'est bon</li>
-      <li>Entrez ensuite le numéro de votre équipe</li>
-      <li>Sélectionnez le fichier XML</li>
-      <li>Validez le formulaire</li>
-    </ul>
-    </p>
-    <p>
-      <label>Tapez une partie du nom de votre team pour l'identifier entre les 2</label>
-      <input type="text" id="team-name-substr" value="boulogne"/>
-    </p>
-    <p>
-      <label>Entrez le numéro de votre équipe</label>
-      <input type="text" id="team-number" value="9" />
-    </p>
-    <p>
-      <label>Sélectionnez le fichier XML</label>
-      <input type="file" id="xml-file-input" accept=".xml" />
-    </p>
-    <p>
-      <button type="text" id="send"
-      style="color:chartreuse;background-color: black; padding: 20px; margin: 20px; width: 300px;text-align: center;border-radius: 10px;"
-      >Envoyer</button>
-    </p>
-    
-    <div id="output" style="margin-top: 20px; white-space: pre-wrap"></div>
 
-    <p>
-      <button type="text" id="send-test">Tester avec le XML ci-dessous</button>
-    </p>
-    <div id="xml-test" style="margin-top: 20px; white-space: pre-wrap"></div>
-
+    <div class="load-file-container">
+      <div class="load-local-file-container">
+        <label for="xml-file-input" id="xml-file-input-label"
+          >Chargez votre fichier XML</label
+        >
+        <input type="file" id="xml-file-input" accept=".xml" hidden />
+      </div>
+      <div class="load-xml-test-container">
+        <button type="text" id="load-xml-test-btn">
+          Charger le XML en exemple ci-dessous
+        </button>
+      </div>
     </div>
+    <div id="output" style="margin-top: 20px; white-space: pre-wrap"></div>
+    <div id="xml-test" style="margin-top: 20px; white-space: pre-wrap">
+      <root>Here will be the XML sample test</root>
+    </div>
+
     <script type="module">
+      var encounter = null;
       export class Match {
         constructor(team, player, match, otherPlayersDict) {
           this.initTeamAndPlayer(team, player);
@@ -216,22 +391,43 @@
       }
 
       export class Encounter {
-        constructor(
-          sheetObject,
-          substrNomclub,
-          numeroequipe,
-          usePlayerCat = false
-        ) {
-          this.sheetObject = sheetObject;
+        constructor(xmlStr) {
+          this.xmlStr = xmlStr;
+          this.sheetObject = this.processXML(xmlStr);
+          this.recto = this.sheetObject.liste.recto;
+          this.equipea = this.recto.equipea;
+          this.equipex = this.recto.equipex;
+          this.equipea["teamLetter"] = "a";
+          this.equipex["teamLetter"] = "x";
+          this.metas = this.recto.typefeuille;
+          this.matchs = this.recto.parties;
+          console.log("this.metas", this.metas);
+          console.log("this.matchs", this.matchs);
+        }
+
+        selectTeamBySubstr(substrNomclub, numeroequipe, usePlayerCat = false) {
           this.substrNomclub = substrNomclub;
           this.numeroequipe = String(numeroequipe);
           this.usePlayerCat = usePlayerCat;
-          this.rectoDict = sheetObject.liste.recto;
-          this.metas = this.rectoDict.typefeuille;
-          console.log("this.metas", this.metas);
-          this.matchs = this.rectoDict.parties;
-          console.log("this.matchs", this.matchs);
           this.initializeTeams();
+        }
+
+        selectTeamByKey(teamKey) {
+          this.myTeam = this[teamKey];
+          this.otherTeam = teamKey == "equipea" ? this.equipex : this.equipea;
+          console.log("this.myTeam", this.myTeam);
+          console.log("this.otherTeam", this.otherTeam);
+          this.mapPlayersToLetters();
+          this.populatePlayersDicts();
+        }
+
+        processXML(xmlStr) {
+          // const decoder = new TextDecoder('windows-1252'); // To handle ANSI encoding
+          // const decodedText = decoder.decode(new TextEncoder().encode(text));
+          console.log("xmlStr", xmlStr);
+          const parser = new DOMParser();
+          const xmlDoc = parser.parseFromString(xmlStr, "application/xml");
+          return xmlToJson(xmlDoc);
         }
 
         initializeTeams() {
@@ -310,7 +506,9 @@
               // } (${matchWinNumber}/${matchPlayedNumber}): ${matchSummaries.join(
               //   " | "
               // )}`;
-              return `- ${player.prenomjoueur} ${player.pointsclassementsjoueur} (${matchWinNumber}/${matchPlayedNumber}): ${matchSummaries.join(
+              return `- ${player.prenomjoueur} ${
+                player.pointsclassementsjoueur
+              } (${matchWinNumber}/${matchPlayedNumber}): ${matchSummaries.join(
                 " | "
               )}`;
             })
@@ -380,8 +578,8 @@
         }
 
         getTeams() {
-          const teamA = this.rectoDict.equipea;
-          const teamX = this.rectoDict.equipex;
+          const teamA = this.recto.equipea;
+          const teamX = this.recto.equipex;
           const clubNameA = teamA.nomclub;
           const clubNameX = teamX.nomclub;
           if (clubNameA === clubNameX) {
@@ -406,6 +604,81 @@
         }
       }
 
+      var popin = {
+        el: null,
+        titleEl: null,
+        closeEl: null,
+        contentEl: null,
+        setTitle: (title) => {
+          popin.titleEl.innerHTML = title;
+        },
+        setContent: (content) => {
+          popin.contentEl.innerHTML = content;
+        },
+        appendContent: (content) => {
+          popin.contentEl.innerHTML += content;
+        },
+        open: (content, title = "Details") => {
+          if (!popin.el) {
+            popin.init();
+          }
+          popin.el.classList.remove("hide");
+          popin.setTitle(title);
+          popin.setContent(content);
+        },
+        close: () => {
+          console.log("popin close");
+          popin.el.classList.add("hide");
+          popin.setTitle("");
+          popin.setContent("");
+        },
+        init: () => {
+          popin.el = document.createElement("div");
+          popin.el.id = "popin-container";
+          popin.el.classList.add("hide");
+          popin.el.innerHTML = `
+              <div id="popin">
+                <div id="popin-header">
+                  <div id="popin-title"></div>
+                  <div id="popin-close">X</div>
+                </div>
+                <div id="popin-content"></div>
+              </div>
+            `;
+          document.body.appendChild(popin.el);
+          popin.titleEl = document.querySelector("#popin-title");
+          popin.contentEl = document.querySelector("#popin-content");
+          popin.closeEl = document.querySelector("#popin-close");
+          popin.closeEl.addEventListener("click", (e) => {
+            popin.close();
+          });
+        },
+        confirm: {
+          open: (message, callback) => {
+            const html = `
+              <div class="confirm">
+                <div class="message">${message}</div>
+                <div class="buttons">
+                  <button type="button" id="popin-confirm-btn-cancel" class="button cancel" title="Annuler">Annuler</button>
+                  <button type="button" id="popin-confirm-btn-confirm" class="button confirm" title="Confirmer">Confirmer</button>
+                </div>
+              </div>
+            `;
+            popin.open(html, "Confirmer");
+            document
+              .querySelector("#popin-confirm-btn-cancel")
+              .addEventListener("click", (e) => {
+                popin.close();
+              });
+            document
+              .querySelector("#popin-confirm-btn-confirm")
+              .addEventListener("click", (e) => {
+                callback();
+              });
+          },
+        },
+      };
+
       // Prompt constant
       const prompt = `
 Fait un beau résumé de rencontre par équipe de pingpong avec ces informations sur les équipes et matchs.
@@ -421,84 +694,68 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
 
 
 `;
-      async function processInputXMLFileContent(content) {
-        // const decoder = new TextDecoder('windows-1252'); // To handle ANSI encoding
-        // const decodedText = decoder.decode(new TextEncoder().encode(text));
-        console.log("content", content);
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(content, "application/xml");
-        const jsObject = xmlToJson(xmlDoc);
-        console.log("jsObject", jsObject);
 
-        const teamNameSubstr = document.getElementById("team-name-substr").value.trim();
-        const teamNumber = document.getElementById("team-number").value.trim();
-        if(teamNameSubstr == ""){
-          alert("Erreur. Champ vide. Veuillez entrez la chaine de caractère pour identifier votre nom d'équipe");
-          return;
-        }
-        if(teamNameSubstr == ""){
-          alert("Erreur. Champ vide. Veuillez entrez la chaine de caractère pour identifier votre nom d'équipe");
-          return;
-        }
+      const loadXMLTestEl = document.getElementById("load-xml-test-btn");
+      const xmlFileInputEl = document.getElementById("xml-file-input");
+      const xmlFileLabelEl = document.getElementById("xml-file-input-label");
 
-        const encounter = new Encounter(jsObject, "boulogne", 9);
-        const summary = encounter.getSummary();
+      xmlFileInputEl.addEventListener("change", async () => {
+        if (xmlFileInputEl.files.length > 0) {
+          xmlFileLabelEl.innerHTML = xmlFileInputEl.files[0].name;
 
-        // Display the result
-        document.getElementById("output").textContent = prompt + summary;
-
-        // document.getElementById("output").textContent = JSON.stringify(
-        //   jsObject,
-        //   null,
-        //   2
-        // );
-      }
-
-      document
-        .getElementById("send")
-        .addEventListener("click", function async(event) {
-          //const file = event.target.files[0];
-          const file = document.getElementById("xml-file-input").files[0]
-          if (!file) {
-            alert("Erreur. Champ vide. Veuillez sélectionner le fichier XML de la rencontre.");
-            return;
+          const file = xmlFileInputEl.files[0];
+          if (file) {
+            const xmlStr = await file.text();
+            encounter = new Encounter(xmlStr);
+            console.log("real encounter", encounter);
+            openSelectTeam(encounter);
           }
-          const reader = new FileReader();
-          reader.onload = function async(e) {
-            const content = e.target.result;
-            processInputXMLFileContent(content);
-          };
-          reader.readAsText(file, "windows-1252");
-        });
-
-      // // Development-only logic to simulate file loading
-      // async function loadDevelopmentFile() {
-      //   const response = await fetch("./20241129_classeur_PH1_J6_M9.xml");
-      //   if (response.ok) {
-      //     const content = await response.text();
-      //     console.log("File content from simulation:", content);
-      //     processInputXMLFileContent(content);
-      //   } else {
-      //     console.error("Failed to load the development XML file.");
-      //   }
-      // }
-      // Call the simulation function during development
-      //loadDevelopmentFile();
-
-      document
-        .getElementById("send-test")
-        .addEventListener("click", function async(event) {
-          document.getElementById("team-name-substr").value = "boulogne"
-          document.getElementById("team-number").value = "9"
-          processInputXMLFileContent(xmlContent);
-        });
-
-      document.addEventListener("DOMContentLoaded", () => {
-        // while dev/testing
-        document.getElementById("xml-test").textContent = xmlContent;
+        }
       });
 
-      function xmlToJson(xml) {
+      loadXMLTestEl.addEventListener("click", () => {
+        encounter = new Encounter(xmlTestStr);
+        console.log("test encounter", encounter);
+        openSelectTeam(encounter);
+      });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("xml-test").textContent = xmlTestStr;
+      });
+
+      const openSelectTeam = (encounter) => {
+        console.log("equipea:", encounter.equipea);
+        console.log("equipex:", encounter.equipex);
+        const nomcluba = `${encounter.equipea.nomclub}<br/>Équipe ${encounter.equipea.numeroequipe}`;
+        const nomclubx = `${encounter.equipex.nomclub}<br/>Équipe ${encounter.equipex.numeroequipe}`;
+
+        const title = "Sélectionner l'équipe";
+        const html = `
+          <div id="popin-select-team-container">
+            <div class="select-team-form">
+              <button class="select-team-btn" data-team-key="equipea">${nomcluba}</button>
+              <button class="select-team-btn" data-team-key="equipex">${nomclubx}</button>
+            </div> 
+          </div> 
+        `;
+        popin.open(html, title);
+        document.querySelectorAll(".select-team-btn").forEach((element) => {
+          element.addEventListener("click", (event) => {
+            const teamKey = event.target.getAttribute("data-team-key");
+            console.log(`Équipe sélectionnée : ${teamKey}`);
+            popin.close();
+            encounter.selectTeamByKey(teamKey);
+            const summary = encounter.getSummary();
+            console.log("summary", summary);
+            // Display the result
+            document.getElementById("output").textContent = prompt + summary;
+          });
+        });
+      };
+
+      // while dev/testing
+
+      const xmlToJson = (xml) => {
         let obj = {};
         if (xml.nodeType === 1) {
           // element node
@@ -537,28 +794,28 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
           return obj["#text"];
         }
         return obj;
-      }
-      const xmlContent = `<?xml version="1.0" encoding="ISO-8859-1"?>
+      };
+      const xmlTestStr = `<?xml version="1.0" encoding="ISO-8859-1"?>
 <liste>
     <recto>
         <typeFeuille>
             <IDFEUILLE>3</IDFEUILLE>
-            <ONGLET>BOULOGNE BILLAN 9 / Trifouillis-les-Oies</ONGLET>
+            <ONGLET>BOULOGNE BILLAN 9 / TRIFFOUILLIS-LES-OIES</ONGLET>
             <NUMEROJOURNEE>6</NUMEROJOURNEE>
             <LETTRECLUBRECEVANT>A</LETTRECLUBRECEVANT>
             <ARBITRAGEPARTAGE>0</ARBITRAGEPARTAGE>
             <CODEFEUILLE>4014</CODEFEUILLE>
             <GENREFEUILLE>AW-BX-CY-DZ-AX-BW-DY-CZ-double 1-double 2-AY-CW-DX-BZ</GENREFEUILLE>
             <SCOREACQUIS>0</SCOREACQUIS>
-            <NOMJA>JUMEAU</NOMJA>
-            <PRENOMJA>Cyril</PRENOMJA>
+            <NOMJA>MARTIN</NOMJA>
+            <PRENOMJA>Barnabé</PRENOMJA>
             <EMAILJA></EMAILJA>
             <TELDOMJA></TELDOMJA>
             <TELMOBJA></TELMOBJA>
             <EXPORTMAILJA>1</EXPORTMAILJA>
-            <NUMEROLICENCEJA>9247186</NUMEROLICENCEJA>
+            <NUMEROLICENCEJA>92471856</NUMEROLICENCEJA>
             <NUMEROCLUBJA>08920067</NUMEROCLUBJA>
-            <NOMCLUBJA>Trifouillis-les-Oies</NOMCLUBJA>
+            <NOMCLUBJA>TRIFFOUILLIS-LES-OIES</NOMCLUBJA>
             <LIEURENCONTRE>BOULOGNE BILLANCOURT</LIEURENCONTRE>
             <LIGUERENCONTRE>HAUTS DE SEINE</LIGUERENCONTRE>
             <DATERENCONTRE>29/11/2024</DATERENCONTRE>
@@ -656,13 +913,13 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
         </equipeA>
         <equipeX>
             <NUMEROCLUB>08920067</NUMEROCLUB>
-            <NOMCLUB>Trifouillis-les-Oies</NOMCLUB>
+            <NOMCLUB>TRIFFOUILLIS-LES-OIES</NOMCLUB>
             <NUMEROENTENTE></NUMEROENTENTE>
             <NOMENTENTE></NOMENTENTE>
             <NUMEROEQUIPE>3</NUMEROEQUIPE>
-            <NOMCAPITAINE>JUMEAU</NOMCAPITAINE>
-            <PRENOMCAPITAINE>Cyril</PRENOMCAPITAINE>
-            <NUMEROLICENCECAPITAINE>9247186</NUMEROLICENCECAPITAINE>
+            <NOMCAPITAINE>MARTIN</NOMCAPITAINE>
+            <PRENOMCAPITAINE>Barnabé</PRENOMCAPITAINE>
+            <NUMEROLICENCECAPITAINE>92471856</NUMEROLICENCECAPITAINE>
             <DOUBLE1>XZ</DOUBLE1>
             <DOUBLE2>WY</DOUBLE2>
             <DOUBLE3></DOUBLE3>
@@ -676,8 +933,8 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
             <TELCOR>0615051554</TELCOR>
             <JOUEUR1>
                 <NUMEROLICENCEJOUEUR>9228222</NUMEROLICENCEJOUEUR>
-                <NOMJOUEUR>RAJAU</NOMJOUEUR>
-                <PRENOMJOUEUR>Bastien</PRENOMJOUEUR>
+                <NOMJOUEUR>BLANC</NOMJOUEUR>
+                <PRENOMJOUEUR>Joseph</PRENOMJOUEUR>
                 <POINTSCLASSEMENTSJOUEUR>1667</POINTSCLASSEMENTSJOUEUR>
                 <DATEMUTATIONJOUEUR></DATEMUTATIONJOUEUR>
                 <NATIONALITEJOUEUR>F</NATIONALITEJOUEUR>
@@ -690,9 +947,9 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
                 <NAISSANCE>01/03/1996</NAISSANCE>
             </JOUEUR1>
             <JOUEUR2>
-                <NUMEROLICENCEJOUEUR>9247186</NUMEROLICENCEJOUEUR>
-                <NOMJOUEUR>JUMEAU</NOMJOUEUR>
-                <PRENOMJOUEUR>Cyril</PRENOMJOUEUR>
+                <NUMEROLICENCEJOUEUR>92471856</NUMEROLICENCEJOUEUR>
+                <NOMJOUEUR>MARTIN</NOMJOUEUR>
+                <PRENOMJOUEUR>Barnabé</PRENOMJOUEUR>
                 <POINTSCLASSEMENTSJOUEUR>860</POINTSCLASSEMENTSJOUEUR>
                 <DATEMUTATIONJOUEUR></DATEMUTATIONJOUEUR>
                 <NATIONALITEJOUEUR>F</NATIONALITEJOUEUR>
@@ -706,8 +963,8 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
             </JOUEUR2>
             <JOUEUR3>
                 <NUMEROLICENCEJOUEUR>9255667</NUMEROLICENCEJOUEUR>
-                <NOMJOUEUR>SERGENT</NOMJOUEUR>
-                <PRENOMJOUEUR>Eric</PRENOMJOUEUR>
+                <NOMJOUEUR>CHOLET</NOMJOUEUR>
+                <PRENOMJOUEUR>Damien</PRENOMJOUEUR>
                 <POINTSCLASSEMENTSJOUEUR>663</POINTSCLASSEMENTSJOUEUR>
                 <DATEMUTATIONJOUEUR></DATEMUTATIONJOUEUR>
                 <NATIONALITEJOUEUR>F</NATIONALITEJOUEUR>
@@ -721,8 +978,8 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
             </JOUEUR3>
             <JOUEUR4>
                 <NUMEROLICENCEJOUEUR>9243263</NUMEROLICENCEJOUEUR>
-                <NOMJOUEUR>BOUTRY</NOMJOUEUR>
-                <PRENOMJOUEUR>Joanna</PRENOMJOUEUR>
+                <NOMJOUEUR>YOUPLA</NOMJOUEUR>
+                <PRENOMJOUEUR>Boum</PRENOMJOUEUR>
                 <POINTSCLASSEMENTSJOUEUR>916</POINTSCLASSEMENTSJOUEUR>
                 <DATEMUTATIONJOUEUR></DATEMUTATIONJOUEUR>
                 <NATIONALITEJOUEUR>F</NATIONALITEJOUEUR>
@@ -740,7 +997,7 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
                 <LETTREA>A</LETTREA>
                 <JOUEURA>CHOMAT Raphael</JOUEURA>
                 <LETTREX>W</LETTREX>
-                <JOUEURX>RAJAU Bastien</JOUEURX>
+                <JOUEURX>BLANC Joseph</JOUEURX>
                 <MANCHE1>-04</MANCHE1>
                 <MANCHE2>-00</MANCHE2>
                 <MANCHE3>-06</MANCHE3>
@@ -751,7 +1008,7 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
                 <POINTSA>1</POINTSA>
                 <POINTSX>2</POINTSX>
                 <CODEREMARQUE1>1</CODEREMARQUE1>
-                <REMARQUE1>partie jou�e</REMARQUE1>
+                <REMARQUE1>partie jouée</REMARQUE1>
                 <CODEREMARQUE2></CODEREMARQUE2>
                 <REMARQUE2></REMARQUE2>
             </PARTIE1>
@@ -759,7 +1016,7 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
                 <LETTREA>B</LETTREA>
                 <JOUEURA>LANGLOIS Xavier</JOUEURA>
                 <LETTREX>X</LETTREX>
-                <JOUEURX>JUMEAU Cyril</JOUEURX>
+                <JOUEURX>MARTIN Barnabé</JOUEURX>
                 <MANCHE1>-09</MANCHE1>
                 <MANCHE2>-05</MANCHE2>
                 <MANCHE3>-09</MANCHE3>
@@ -770,7 +1027,7 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
                 <POINTSA>1</POINTSA>
                 <POINTSX>2</POINTSX>
                 <CODEREMARQUE1>1</CODEREMARQUE1>
-                <REMARQUE1>partie jou�e</REMARQUE1>
+                <REMARQUE1>partie jouée</REMARQUE1>
                 <CODEREMARQUE2></CODEREMARQUE2>
                 <REMARQUE2></REMARQUE2>
             </PARTIE2>
@@ -778,7 +1035,7 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
                 <LETTREA>C</LETTREA>
                 <JOUEURA>DEGUIL Christophe</JOUEURA>
                 <LETTREX>Y</LETTREX>
-                <JOUEURX>SERGENT Eric</JOUEURX>
+                <JOUEURX>CHOLET Damien</JOUEURX>
                 <MANCHE1>-09</MANCHE1>
                 <MANCHE2>-10</MANCHE2>
                 <MANCHE3>-15</MANCHE3>
@@ -789,7 +1046,7 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
                 <POINTSA>1</POINTSA>
                 <POINTSX>2</POINTSX>
                 <CODEREMARQUE1>1</CODEREMARQUE1>
-                <REMARQUE1>partie jou�e</REMARQUE1>
+                <REMARQUE1>partie jouée</REMARQUE1>
                 <CODEREMARQUE2></CODEREMARQUE2>
                 <REMARQUE2></REMARQUE2>
             </PARTIE3>
@@ -797,7 +1054,7 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
                 <LETTREA>D</LETTREA>
                 <JOUEURA>AUBERT Richard</JOUEURA>
                 <LETTREX>Z</LETTREX>
-                <JOUEURX>BOUTRY Joanna</JOUEURX>
+                <JOUEURX>YOUPLA Boum</JOUEURX>
                 <MANCHE1>06</MANCHE1>
                 <MANCHE2>06</MANCHE2>
                 <MANCHE3>10</MANCHE3>
@@ -808,7 +1065,7 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
                 <POINTSA>2</POINTSA>
                 <POINTSX>1</POINTSX>
                 <CODEREMARQUE1>1</CODEREMARQUE1>
-                <REMARQUE1>partie jou�e</REMARQUE1>
+                <REMARQUE1>partie jouée</REMARQUE1>
                 <CODEREMARQUE2></CODEREMARQUE2>
                 <REMARQUE2></REMARQUE2>
             </PARTIE4>
@@ -816,7 +1073,7 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
                 <LETTREA>A</LETTREA>
                 <JOUEURA>CHOMAT Raphael</JOUEURA>
                 <LETTREX>X</LETTREX>
-                <JOUEURX>JUMEAU Cyril</JOUEURX>
+                <JOUEURX>MARTIN Barnabé</JOUEURX>
                 <MANCHE1>05</MANCHE1>
                 <MANCHE2>10</MANCHE2>
                 <MANCHE3>08</MANCHE3>
@@ -827,7 +1084,7 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
                 <POINTSA>2</POINTSA>
                 <POINTSX>1</POINTSX>
                 <CODEREMARQUE1>1</CODEREMARQUE1>
-                <REMARQUE1>partie jou�e</REMARQUE1>
+                <REMARQUE1>partie jouée</REMARQUE1>
                 <CODEREMARQUE2></CODEREMARQUE2>
                 <REMARQUE2></REMARQUE2>
             </PARTIE5>
@@ -835,7 +1092,7 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
                 <LETTREA>B</LETTREA>
                 <JOUEURA>LANGLOIS Xavier</JOUEURA>
                 <LETTREX>W</LETTREX>
-                <JOUEURX>RAJAU Bastien</JOUEURX>
+                <JOUEURX>BLANC Joseph</JOUEURX>
                 <MANCHE1>-06</MANCHE1>
                 <MANCHE2>-07</MANCHE2>
                 <MANCHE3>-04</MANCHE3>
@@ -846,7 +1103,7 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
                 <POINTSA>1</POINTSA>
                 <POINTSX>2</POINTSX>
                 <CODEREMARQUE1>1</CODEREMARQUE1>
-                <REMARQUE1>partie jou�e</REMARQUE1>
+                <REMARQUE1>partie jouée</REMARQUE1>
                 <CODEREMARQUE2></CODEREMARQUE2>
                 <REMARQUE2></REMARQUE2>
             </PARTIE6>
@@ -854,7 +1111,7 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
                 <LETTREA>D</LETTREA>
                 <JOUEURA>AUBERT Richard</JOUEURA>
                 <LETTREX>Y</LETTREX>
-                <JOUEURX>SERGENT Eric</JOUEURX>
+                <JOUEURX>CHOLET Damien</JOUEURX>
                 <MANCHE1>08</MANCHE1>
                 <MANCHE2>06</MANCHE2>
                 <MANCHE3>05</MANCHE3>
@@ -865,7 +1122,7 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
                 <POINTSA>2</POINTSA>
                 <POINTSX>1</POINTSX>
                 <CODEREMARQUE1>1</CODEREMARQUE1>
-                <REMARQUE1>partie jou�e</REMARQUE1>
+                <REMARQUE1>partie jouée</REMARQUE1>
                 <CODEREMARQUE2></CODEREMARQUE2>
                 <REMARQUE2></REMARQUE2>
             </PARTIE7>
@@ -873,7 +1130,7 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
                 <LETTREA>C</LETTREA>
                 <JOUEURA>DEGUIL Christophe</JOUEURA>
                 <LETTREX>Z</LETTREX>
-                <JOUEURX>BOUTRY Joanna</JOUEURX>
+                <JOUEURX>YOUPLA Boum</JOUEURX>
                 <MANCHE1>05</MANCHE1>
                 <MANCHE2>07</MANCHE2>
                 <MANCHE3>-06</MANCHE3>
@@ -884,7 +1141,7 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
                 <POINTSA>2</POINTSA>
                 <POINTSX>1</POINTSX>
                 <CODEREMARQUE1>1</CODEREMARQUE1>
-                <REMARQUE1>partie jou�e</REMARQUE1>
+                <REMARQUE1>partie jouée</REMARQUE1>
                 <CODEREMARQUE2></CODEREMARQUE2>
                 <REMARQUE2></REMARQUE2>
             </PARTIE8>
@@ -892,7 +1149,7 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
                 <LETTREA>BC</LETTREA>
                 <JOUEURA>LANGLOIS Xavier / DEGUIL Christophe</JOUEURA>
                 <LETTREX>XZ</LETTREX>
-                <JOUEURX>JUMEAU Cyril / BOUTRY Joanna</JOUEURX>
+                <JOUEURX>MARTIN Barnabé / YOUPLA Boum</JOUEURX>
                 <MANCHE1>-08</MANCHE1>
                 <MANCHE2>-05</MANCHE2>
                 <MANCHE3>-09</MANCHE3>
@@ -903,7 +1160,7 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
                 <POINTSA>1</POINTSA>
                 <POINTSX>2</POINTSX>
                 <CODEREMARQUE1>1</CODEREMARQUE1>
-                <REMARQUE1>partie jou�e</REMARQUE1>
+                <REMARQUE1>partie jouée</REMARQUE1>
                 <CODEREMARQUE2></CODEREMARQUE2>
                 <REMARQUE2></REMARQUE2>
             </PARTIE9>
@@ -911,7 +1168,7 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
                 <LETTREA>AD</LETTREA>
                 <JOUEURA>CHOMAT Raphael / AUBERT Richard</JOUEURA>
                 <LETTREX>WY</LETTREX>
-                <JOUEURX>RAJAU Bastien / SERGENT Eric</JOUEURX>
+                <JOUEURX>BLANC Joseph / CHOLET Damien</JOUEURX>
                 <MANCHE1>07</MANCHE1>
                 <MANCHE2>-12</MANCHE2>
                 <MANCHE3>-05</MANCHE3>
@@ -922,7 +1179,7 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
                 <POINTSA>1</POINTSA>
                 <POINTSX>2</POINTSX>
                 <CODEREMARQUE1>1</CODEREMARQUE1>
-                <REMARQUE1>partie jou�e</REMARQUE1>
+                <REMARQUE1>partie jouée</REMARQUE1>
                 <CODEREMARQUE2></CODEREMARQUE2>
                 <REMARQUE2></REMARQUE2>
             </PARTIE10>
@@ -930,7 +1187,7 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
                 <LETTREA>A</LETTREA>
                 <JOUEURA>CHOMAT Raphael</JOUEURA>
                 <LETTREX>Y</LETTREX>
-                <JOUEURX>SERGENT Eric</JOUEURX>
+                <JOUEURX>CHOLET Damien</JOUEURX>
                 <MANCHE1>08</MANCHE1>
                 <MANCHE2>07</MANCHE2>
                 <MANCHE3>06</MANCHE3>
@@ -941,7 +1198,7 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
                 <POINTSA>2</POINTSA>
                 <POINTSX>1</POINTSX>
                 <CODEREMARQUE1>1</CODEREMARQUE1>
-                <REMARQUE1>partie jou�e</REMARQUE1>
+                <REMARQUE1>partie jouée</REMARQUE1>
                 <CODEREMARQUE2></CODEREMARQUE2>
                 <REMARQUE2></REMARQUE2>
             </PARTIE11>
@@ -949,7 +1206,7 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
                 <LETTREA>C</LETTREA>
                 <JOUEURA>DEGUIL Christophe</JOUEURA>
                 <LETTREX>W</LETTREX>
-                <JOUEURX>RAJAU Bastien</JOUEURX>
+                <JOUEURX>BLANC Joseph</JOUEURX>
                 <MANCHE1>-01</MANCHE1>
                 <MANCHE2>-03</MANCHE2>
                 <MANCHE3>-07</MANCHE3>
@@ -960,7 +1217,7 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
                 <POINTSA>1</POINTSA>
                 <POINTSX>2</POINTSX>
                 <CODEREMARQUE1>1</CODEREMARQUE1>
-                <REMARQUE1>partie jou�e</REMARQUE1>
+                <REMARQUE1>partie jouée</REMARQUE1>
                 <CODEREMARQUE2></CODEREMARQUE2>
                 <REMARQUE2></REMARQUE2>
             </PARTIE12>
@@ -968,7 +1225,7 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
                 <LETTREA>D</LETTREA>
                 <JOUEURA>AUBERT Richard</JOUEURA>
                 <LETTREX>X</LETTREX>
-                <JOUEURX>JUMEAU Cyril</JOUEURX>
+                <JOUEURX>MARTIN Barnabé</JOUEURX>
                 <MANCHE1>06</MANCHE1>
                 <MANCHE2>-05</MANCHE2>
                 <MANCHE3>11</MANCHE3>
@@ -979,7 +1236,7 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
                 <POINTSA>2</POINTSA>
                 <POINTSX>1</POINTSX>
                 <CODEREMARQUE1>1</CODEREMARQUE1>
-                <REMARQUE1>partie jou�e</REMARQUE1>
+                <REMARQUE1>partie jouée</REMARQUE1>
                 <CODEREMARQUE2></CODEREMARQUE2>
                 <REMARQUE2></REMARQUE2>
             </PARTIE13>
@@ -987,7 +1244,7 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
                 <LETTREA>B</LETTREA>
                 <JOUEURA>LANGLOIS Xavier</JOUEURA>
                 <LETTREX>Z</LETTREX>
-                <JOUEURX>BOUTRY Joanna</JOUEURX>
+                <JOUEURX>YOUPLA Boum</JOUEURX>
                 <MANCHE1>06</MANCHE1>
                 <MANCHE2>-09</MANCHE2>
                 <MANCHE3>-08</MANCHE3>
@@ -998,7 +1255,7 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
                 <POINTSA>1</POINTSA>
                 <POINTSX>2</POINTSX>
                 <CODEREMARQUE1>1</CODEREMARQUE1>
-                <REMARQUE1>partie jou�e</REMARQUE1>
+                <REMARQUE1>partie jouée</REMARQUE1>
                 <CODEREMARQUE2></CODEREMARQUE2>
                 <REMARQUE2></REMARQUE2>
             </PARTIE14>
