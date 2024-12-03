@@ -53,6 +53,7 @@
 
       .load-file-container button,
       label#xml-file-input-label {
+        min-width: 400px;
         padding: 15px 30px;
         font-size: 1.2em;
         font-weight: bold;
@@ -63,6 +64,7 @@
         cursor: pointer;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         transition: background-color 0.3s, transform 0.2s;
+        text-align: center;
       }
 
       button:hover {
@@ -71,6 +73,15 @@
 
       button:active {
         transform: scale(0.98);
+      }
+
+      .options {
+        margin-top: 20px;
+        padding: 20px;
+        text-align: left;
+      }
+      .options legend {
+        padding: 0 10px 0 10px;
       }
 
       #xml-test {
@@ -84,8 +95,8 @@
       }
 
       /******************
-*** POPIN COMMON ***
-******************/
+      *** POPIN COMMON ***
+      ******************/
 
       #popin-container {
         position: fixed;
@@ -96,7 +107,7 @@
         left: 0px;
         width: 100vw;
         height: 100vw;
-        background-color: rgba(255, 255, 255, 0.7);
+        background-color: rgba(255, 255, 255, 0.8);
       }
       #popin {
         position: fixed;
@@ -159,7 +170,7 @@
       }
 
       /******************
-*** POPIN CUSTOM ***/
+      *** POPIN CUSTOM ***/
 
       #popin-select-team-container {
         width: 800px;
@@ -388,6 +399,83 @@
           }
           return tags;
         }
+
+        winLossPoint() {
+          return [
+            {
+              ecart_de_points_min: 0,
+              ecart_de_points_max: 24,
+              victoire_normale: 6,
+              defaite_normale: -5,
+              victoire_anormale: 6,
+              defaite_anormale: -5,
+            },
+            {
+              ecart_de_points_min: 25,
+              ecart_de_points_max: 49,
+              victoire_normale: 5.5,
+              defaite_normale: -4.5,
+              victoire_anormale: 7,
+              defaite_anormale: -6,
+            },
+            {
+              ecart_de_points_min: 50,
+              ecart_de_points_max: 99,
+              victoire_normale: 5,
+              defaite_normale: -4,
+              victoire_anormale: 8,
+              defaite_anormale: -7,
+            },
+            {
+              ecart_de_points_min: 100,
+              ecart_de_points_max: 149,
+              victoire_normale: 4,
+              defaite_normale: -3,
+              victoire_anormale: 10,
+              defaite_anormale: -8,
+            },
+            {
+              ecart_de_points_min: 150,
+              ecart_de_points_max: 199,
+              victoire_normale: 3,
+              defaite_normale: -2,
+              victoire_anormale: 13,
+              defaite_anormale: -10,
+            },
+            {
+              ecart_de_points_min: 200,
+              ecart_de_points_max: 299,
+              victoire_normale: 2,
+              defaite_normale: -1,
+              victoire_anormale: 17,
+              defaite_anormale: -12.5,
+            },
+            {
+              ecart_de_points_min: 300,
+              ecart_de_points_max: 399,
+              victoire_normale: 1,
+              defaite_normale: -0.5,
+              victoire_anormale: 22,
+              defaite_anormale: -16,
+            },
+            {
+              ecart_de_points_min: 400,
+              ecart_de_points_max: 499,
+              victoire_normale: 0.5,
+              defaite_normale: 0,
+              victoire_anormale: 28,
+              defaite_anormale: -20,
+            },
+            {
+              ecart_de_points_min: 500,
+              ecart_de_points_max: 9999,
+              victoire_normale: 0,
+              defaite_normale: 0,
+              victoire_anormale: 40,
+              defaite_anormale: -29,
+            },
+          ];
+        }
       }
 
       export class Encounter {
@@ -401,15 +489,17 @@
           this.equipex["teamLetter"] = "x";
           this.metas = this.recto.typefeuille;
           this.matchs = this.recto.parties;
+          this.usePlayerCat = false;
           console.log("this.metas", this.metas);
           console.log("this.matchs", this.matchs);
         }
 
-        selectTeamBySubstr(substrNomclub, numeroequipe, usePlayerCat = false) {
-          this.substrNomclub = substrNomclub;
-          this.numeroequipe = String(numeroequipe);
-          this.usePlayerCat = usePlayerCat;
-          this.initializeTeams();
+        setSelectedTemplate(tpl) {
+          // "small" or "prompt"
+          this.template = tpl;
+          if(this.template != "small"){
+            this.usePlayerCat = true;
+          }
         }
 
         selectTeamByKey(teamKey) {
@@ -523,25 +613,25 @@
           } ####\n${playersSummary.trim()}\n\n${playersDetails.trim()}`;
         }
 
-        getPlayerSummary(player, usePlayerCat = true) {
+        getPlayerSummary(player) {
           const points = parseInt(player.pointsclassementsjoueur, 10);
           const lastname = player.nomjoueur;
           const firstname = player.prenomjoueur;
           const cat = player.categoriejoueur;
-          let text = `Classement:${points} ${lastname} ${firstname}`;
-          if (usePlayerCat) {
+          let text = `${points} ${lastname} ${firstname}`;
+          if(this.template != "small"){
+            text = `Classement:${points} ${lastname} ${firstname}`;
+          }
+          if (this.usePlayerCat) {
             text += ` (Catégorie:${cat})`;
           }
           return { text, points };
         }
 
-        getPlayersSummaryByTeam(teamPlayers, usePlayerCat = true) {
+        getPlayersSummaryByTeam(teamPlayers) {
           let totalPoints = 0;
           const playersTextList = teamPlayers.map((player) => {
-            const { text, points } = this.getPlayerSummary(
-              player,
-              usePlayerCat
-            );
+            const { text, points } = this.getPlayerSummary(player);
             totalPoints += points;
             return text;
           });
@@ -552,7 +642,7 @@
           const {
             playersTextList: myPlayersTxts,
             totalPoints: myPlayersTotalPoints,
-          } = this.getPlayersSummaryByTeam(this.myPlayers, this.usePlayerCat);
+          } = this.getPlayersSummaryByTeam(this.myPlayers);
           const {
             playersTextList: otherPlayersTxts,
             totalPoints: otherPlayersTotalPoints,
@@ -681,7 +771,8 @@
 
       // Prompt constant
       const prompt = `
-Fait un beau résumé de rencontre par équipe de pingpong avec ces informations sur les équipes et matchs.
+Fait un beau résumé de rencontre par équipe de ping-pong avec ces informations sur les équipes et matchs. 
+Mets-y de l'humour et de la positivité.
 
 #### Information à ne pas reprendre dans le résumé mais à prendre en considération: 
 Sache que le classement d'un joueur de ping-pong commence à 500 et on arrive dans les meilleurs 1000 français à partir de 2000.
@@ -691,7 +782,6 @@ Si on gagne un joueur qui est beaucoup mieux classé que nous de 200 points par 
 Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joueur perdant va perdre beaucoup de points dans son classement.
 
 # Informations à résumer:
-
 
 `;
 
@@ -735,7 +825,20 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
             <div class="select-team-form">
               <button class="select-team-btn" data-team-key="equipea">${nomcluba}</button>
               <button class="select-team-btn" data-team-key="equipex">${nomclubx}</button>
-            </div> 
+            </div>
+            <fieldset class="options">
+              <legend>Options</legend>
+              <div class="template-options">
+                <div class="template-option">
+                  <input type="radio" id="template-option-small" name="template" value="small" checked />
+                  <label for="template-option-small">Format court</label>
+                </div>
+                <div class="template-option">
+                  <input type="radio" id="template-option-prompt" name="template" value="prompt"/>
+                  <label for="template-option-prompt">Format prompt pour ChatGPT</label>
+                </div>
+              </div>
+            </fieldset>
           </div> 
         `;
         popin.open(html, title);
@@ -743,12 +846,27 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
           element.addEventListener("click", (event) => {
             const teamKey = event.target.getAttribute("data-team-key");
             console.log(`Équipe sélectionnée : ${teamKey}`);
-            popin.close();
             encounter.selectTeamByKey(teamKey);
-            const summary = encounter.getSummary();
-            console.log("summary", summary);
+
+            let selectedTemplate = "small";
+            const selectedTemplateEl = document.querySelector(
+              'input[name="template"]:checked'
+            );
+            if (selectedTemplateEl) {
+              selectedTemplate = selectedTemplateEl.value;
+            }
+            console.log("selectedTemplate", selectedTemplate); // Output will be "small" or "prompt" based on the selected option
+            encounter.setSelectedTemplate(selectedTemplate);
+
+            let result = encounter.getSummary();
+            console.log("result", result);
+            popin.close();
             // Display the result
-            document.getElementById("output").textContent = prompt + summary;
+            
+            if(encounter.template == "prompt"){
+              result = prompt + result
+            }
+            document.getElementById("output").textContent = result;
           });
         });
       };
@@ -795,6 +913,7 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
         }
         return obj;
       };
+
       const xmlTestStr = `<?xml version="1.0" encoding="ISO-8859-1"?>
 <liste>
     <recto>
