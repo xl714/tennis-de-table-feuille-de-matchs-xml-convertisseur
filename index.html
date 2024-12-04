@@ -10,8 +10,9 @@
       }
       body {
         font-family: Arial, sans-serif;
-        margin: 20px;
+        padding: 10px;
         background-color: #f8f9fa;
+        overflow-x: hidden;
       }
 
       h1 {
@@ -54,15 +55,7 @@
         margin-bottom: 10px;
       }
 
-      #xml-file-input {
-        padding: 10px;
-        font-size: 1em;
-        border: 2px solid #ccc;
-        border-radius: 5px;
-      }
-
-      .load-file-container button,
-      label#xml-file-input-label {
+      .load-input {
         min-width: 400px;
         padding: 15px 30px;
         font-size: 1.2em;
@@ -75,6 +68,11 @@
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         transition: background-color 0.3s, transform 0.2s;
         text-align: center;
+      }
+
+      .disclaimer {
+        font-size: x-small;
+        text-align: right;
       }
 
       button:hover {
@@ -94,6 +92,18 @@
         padding: 0 10px 0 10px;
       }
 
+      .result-constainer {
+        border: 1px solid silver;
+        padding: 10px;
+        margin-bottom: 10px;
+      }
+
+      .result-title {
+        font-weight: bold;
+        font-size: 1.1em;
+        margin: 5px 0 5px 0;
+      }
+
       #xml-test {
         text-align: left;
         color: #333;
@@ -102,6 +112,7 @@
         border-radius: 5px;
         background-color: #fff;
         margin-top: 20px;
+        font-size: 0.8em;
       }
 
       /******************
@@ -116,8 +127,8 @@
         top: 0px;
         left: 0px;
         width: 100vw;
-        height: 100vw;
-        background-color: rgba(255, 255, 255, 0.8);
+        height: 100vh;
+        background-color: rgba(59, 59, 59, 0.95);
       }
       #popin {
         position: fixed;
@@ -210,6 +221,76 @@
       .select-team-btn:hover {
         background-color: #0056b3; /* Change la couleur au survol */
       }
+
+      @media only screen and (max-device-width: 900px) {
+        body {
+          width: 95vw;
+          position: relative;
+          left: -2.5vw;
+        }
+        h1 {
+          width: 100%;
+          font-size: 1.3em;
+        }
+        .load-file-container {
+          display: block;
+          text-align: center;
+        }
+        .load-file-container > div {
+          width: 100%;
+          display: block;
+          text-align: center;
+        }
+        .load-input {
+          display: inline-block;
+          width: 85% !important;
+          max-width: 85% !important;
+          font-size: 1em !important;
+          min-width: 85% !important;
+        }
+        .load-input:first-of-type {
+          margin-bottom: 10px;
+        }
+        #xml-test {
+          width: 90%;
+          overflow-x: auto;
+          overflow-y: visible;
+          font-size: 0.7em;
+        }
+        #popin {
+          max-width: 90vw;
+        }
+        #popin-content {
+          overflow: hidden;
+        }
+        .select-team-form {
+          display: block;
+          width: 80vw;
+          gap: unset;
+          text-align: center;
+        }
+        .select-team-btn {
+          width: 90%;
+          font-size: 1em;
+          padding: 8px 10px;
+        }
+        .select-team-btn:first-of-type {
+          margin-bottom: 8px;
+        }
+        .options {
+          text-align: left;
+          width: 69vw;
+          border: 1px solid gray;
+        }
+        .result-constainer {
+          border: 1px solid silver;
+          padding: 5px;
+          margin-bottom: 5px;
+        }
+        /* .result-constainer legend {
+          margin-left: 10px;
+        } */
+      }
     </style>
   </head>
   <body>
@@ -219,20 +300,29 @@
       par email la feuille de match au format XML.
     </p>
     <p>Ensuite téléchargez le fichier sur votre ordinateur.</p>
+    <p class="disclaimer">
+      Si vous appercevez une erreur envoyez moi un email à
+      xavier.langlois.2022+tt@gmail.com
+    </p>
 
     <div class="load-file-container">
       <div class="load-local-file-container">
-        <label for="xml-file-input" id="xml-file-input-label"
-          >Chargez votre fichier XML</label
+        <!--label for="xml-file-input" id="load-xml-file-input-btn" class="load-input">Chargez votre fichier XML</label-->
+        <button
+          onclick="document.getElementById('xml-file-input').click();"
+          id="load-xml-file-input-btn"
+          class="load-input"
         >
-        <input type="file" id="xml-file-input" accept=".xml" hidden />
+          Chargez votre fichier XML
+        </button>
       </div>
       <div class="load-xml-test-container">
-        <button type="text" id="load-xml-test-btn">
+        <button id="load-xml-test-btn" class="load-input">
           Charger le XML en exemple ci-dessous
         </button>
       </div>
     </div>
+    <input type="file" id="xml-file-input" accept=".xml" hidden />
     <div id="output" style="margin-top: 20px; white-space: pre-wrap"></div>
     <div id="xml-test" style="margin-top: 20px; white-space: pre-wrap">
       <root>Here will be the XML sample test</root>
@@ -249,9 +339,6 @@
           this.assignTagsByDiff();
           this.extractSets(match);
           this.teamLetterWin = match["pointsa"] === "2" ? "a" : "x";
-
-          console.log("Match init - this.teamLetterWin", this.teamLetterWin);
-          console.log("Match init - this.win", this.win);
         }
 
         initTeamAndPlayer(team, player) {
@@ -797,11 +884,13 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
 
       const loadXMLTestEl = document.getElementById("load-xml-test-btn");
       const xmlFileInputEl = document.getElementById("xml-file-input");
-      const xmlFileLabelEl = document.getElementById("xml-file-input-label");
+      const loadXMLFileBtnEl = document.getElementById(
+        "load-xml-file-input-btn"
+      );
 
       xmlFileInputEl.addEventListener("change", async () => {
         if (xmlFileInputEl.files.length > 0) {
-          xmlFileLabelEl.innerHTML = xmlFileInputEl.files[0].name;
+          loadXMLFileBtnEl.innerHTML = xmlFileInputEl.files[0].name;
 
           const file = xmlFileInputEl.files[0];
           if (file) {
@@ -876,16 +965,14 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
             if (encounter.template == "prompt") {
               result = prompt + result;
             }
-            const resultItemEl = document.createElement("fieldset");
+            const resultItemEl = document.createElement("div");
             resultItemEl.classList.add("result-constainer");
-            resultItemEl.innerHTML = `
-              <legend>Résultat</legend>
-              <div class="result">
-                ${result}
-              </div>
-            `;
+            resultItemEl.innerHTML = `<div class="result"><div class="result-title">Résultat:</div>${result}</div>`;
             const outputEl = document.getElementById("output");
             outputEl.insertAdjacentElement("afterbegin", resultItemEl);
+
+            loadXMLFileBtnEl.innerHTML = "Chargez votre fichier XML";
+            xmlFileInputEl.value = "";
           });
         });
       };
