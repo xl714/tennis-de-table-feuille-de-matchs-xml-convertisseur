@@ -23,6 +23,16 @@
         color: #555;
         text-align: left;
       }
+      .result {
+        margin-bottom: 10px;
+        color: #555;
+        font-size: 0.9em;
+      }
+
+      .result-constainer legend {
+        padding: 0 15px 0 15px;
+        font-size: 1.1em;
+      }
 
       .load-file-container {
         display: flex;
@@ -497,7 +507,7 @@
         setSelectedTemplate(tpl) {
           // "small" or "prompt"
           this.template = tpl;
-          if(this.template != "small"){
+          if (this.template != "small") {
             this.usePlayerCat = true;
           }
         }
@@ -619,7 +629,7 @@
           const firstname = player.prenomjoueur;
           const cat = player.categoriejoueur;
           let text = `${points} ${lastname} ${firstname}`;
-          if(this.template != "small"){
+          if (this.template != "small") {
             text = `Classement:${points} ${lastname} ${firstname}`;
           }
           if (this.usePlayerCat) {
@@ -862,11 +872,20 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
             console.log("result", result);
             popin.close();
             // Display the result
-            
-            if(encounter.template == "prompt"){
-              result = prompt + result
+
+            if (encounter.template == "prompt") {
+              result = prompt + result;
             }
-            document.getElementById("output").textContent = result;
+            const resultItemEl = document.createElement("fieldset");
+            resultItemEl.classList.add("result-constainer");
+            resultItemEl.innerHTML = `
+              <legend>Résultat</legend>
+              <div class="result">
+                ${result}
+              </div>
+            `;
+            const outputEl = document.getElementById("output");
+            outputEl.insertAdjacentElement("afterbegin", resultItemEl);
           });
         });
       };
