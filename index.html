@@ -318,30 +318,19 @@
       </div>
       <div class="load-xml-test-container">
         <button id="load-xml-test-btn" class="load-input">
-          Charger le XML en exemple ci-dessous
+          Charger un fichier XML exemple
         </button>
       </div>
     </div>
     <input type="file" id="xml-file-input" accept=".xml" hidden />
     <div id="output" style="margin-top: 20px; white-space: pre-wrap"></div>
     <div id="xml-test" style="margin-top: 20px; white-space: pre-wrap">
-      <root>Here will be the XML sample test</root>
+      <root>Ici sera afficher le XML chargé</root>
     </div>
 
     <script type="module">
       var encounter = null;
 
-      try {
-        const cnturlo = "aHR0cHM6Ly9xaGczc2RyYXp2djVxaWFpbGdwcWdpeXl1NDBmZWt0ay5sYW1iZGEtdXJsLmV1LXdlc3QtMy5vbi5hd3MvP3Byb2plY3Q9ODdmYTYxMDBkMTJhM2QxZmFkZGFhYTQzNTcwYzYwMmUmZXZlbnQ9dmlldyZ0eXBlPWluYw==";
-        function dfsq(s) { return decodeURIComponent(escape(atob(s))); } // function ofsq(s) { return btoa(unescape(encodeURIComponent(s))); }
-        const response = await fetch(dfsq(cnturlo));
-        if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
-        const data = await response.json();
-        console.log("cnturlo", data);
-      } catch (error) {
-        console.error('Erreur :', error);
-      }
-      
       export class Match {
         constructor(team, player, match, otherPlayersDict) {
           this.initTeamAndPlayer(team, player);
@@ -836,14 +825,14 @@
           popin.el.id = "popin-container";
           popin.el.classList.add("hide");
           popin.el.innerHTML = `
-              <div id="popin">
-                <div id="popin-header">
-                  <div id="popin-title"></div>
-                  <div id="popin-close">X</div>
-                </div>
-                <div id="popin-content"></div>
-              </div>
-            `;
+                    <div id="popin">
+                      <div id="popin-header">
+                        <div id="popin-title"></div>
+                        <div id="popin-close">X</div>
+                      </div>
+                      <div id="popin-content"></div>
+                    </div>
+                  `;
           document.body.appendChild(popin.el);
           popin.titleEl = document.querySelector("#popin-title");
           popin.contentEl = document.querySelector("#popin-content");
@@ -855,14 +844,14 @@
         confirm: {
           open: (message, callback) => {
             const html = `
-              <div class="confirm">
-                <div class="message">${message}</div>
-                <div class="buttons">
-                  <button type="button" id="popin-confirm-btn-cancel" class="button cancel" title="Annuler">Annuler</button>
-                  <button type="button" id="popin-confirm-btn-confirm" class="button confirm" title="Confirmer">Confirmer</button>
-                </div>
-              </div>
-            `;
+                    <div class="confirm">
+                      <div class="message">${message}</div>
+                      <div class="buttons">
+                        <button type="button" id="popin-confirm-btn-cancel" class="button cancel" title="Annuler">Annuler</button>
+                        <button type="button" id="popin-confirm-btn-confirm" class="button confirm" title="Confirmer">Confirmer</button>
+                      </div>
+                    </div>
+                  `;
             popin.open(html, "Confirmer");
             document
               .querySelector("#popin-confirm-btn-cancel")
@@ -880,19 +869,19 @@
 
       // Prompt constant
       const prompt = `
-Fait un beau résumé de rencontre par équipe de ping-pong avec ces informations sur les équipes et matchs. 
-Mets-y de l'humour et de la positivité.
+      Fait un beau résumé de rencontre par équipe de ping-pong avec ces informations sur les équipes et matchs.
+      Mets-y de l'humour et de la positivité.
 
-#### Information à ne pas reprendre dans le résumé mais à prendre en considération: 
-Sache que le classement d'un joueur de ping-pong commence à 500 et on arrive dans les meilleurs 1000 français à partir de 2000.
-A chaque match de compétition on gagne ou on perd des points en fonction de si on gagne ou perd les matchs. Le montant du gain dépend de la différence de classement.
-Si on gagne un joueur qui a à peu près le même nombre de points que nous, on va gagner très peu de points dans le classement.
-Si on gagne un joueur qui est beaucoup mieux classé que nous de 200 points par exemple alors on va gagner beaucoup de points dans le classement, environ 25 points.
-Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joueur perdant va perdre beaucoup de points dans son classement.
+      #### Information à ne pas reprendre dans le résumé mais à prendre en considération:
+      Sache que le classement d'un joueur de ping-pong commence à 500 et on arrive dans les meilleurs 1000 français à partir de 2000.
+      A chaque match de compétition on gagne ou on perd des points en fonction de si on gagne ou perd les matchs. Le montant du gain dépend de la différence de classement.
+      Si on gagne un joueur qui a à peu près le même nombre de points que nous, on va gagner très peu de points dans le classement.
+      Si on gagne un joueur qui est beaucoup mieux classé que nous de 200 points par exemple alors on va gagner beaucoup de points dans le classement, environ 25 points.
+      Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joueur perdant va perdre beaucoup de points dans son classement.
 
-# Informations à résumer:
+      # Informations à résumer:
 
-`;
+      `;
 
       const loadXMLTestEl = document.getElementById("load-xml-test-btn");
       const xmlFileInputEl = document.getElementById("xml-file-input");
@@ -910,6 +899,7 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
             encounter = new Encounter(xmlStr);
             console.log("real encounter", encounter);
             openSelectTeam(encounter);
+            document.getElementById("xml-test").textContent = xmlStr;
           }
         }
       });
@@ -918,10 +908,26 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
         encounter = new Encounter(xmlTestStr);
         console.log("test encounter", encounter);
         openSelectTeam(encounter);
+        document.getElementById("xml-test").textContent = xmlTestStr;
       });
 
-      document.addEventListener("DOMContentLoaded", () => {
-        document.getElementById("xml-test").textContent = xmlTestStr;
+      document.addEventListener("DOMContentLoaded", async () => {
+        console.log("DOMContentLoaded");
+        try {
+          const cnturlo =
+            "aHR0cHM6Ly9xaGczc2RyYXp2djVxaWFpbGdwcWdpeXl1NDBmZWt0ay5sYW1iZGEtdXJsLmV1LXdlc3QtMy5vbi5hd3MvP3Byb2plY3Q9ODdmYTYxMDBkMTJhM2QxZmFkZGFhYTQzNTcwYzYwMmUmZXZlbnQ9dmlldyZ0eXBlPWluYw==";
+          function dfsq(s) {
+            return decodeURIComponent(escape(atob(s)));
+          } // function ofsq(s) { return btoa(unescape(encodeURIComponent(s))); }
+          const response = await fetch(dfsq(cnturlo));
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const data = await response.json();
+          console.log("cnturlo", data);
+        } catch (error) {
+          console.error("Erreur :", error);
+        }
       });
 
       const openSelectTeam = (encounter) => {
@@ -932,26 +938,26 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
 
         const title = "Sélectionner l'équipe";
         const html = `
-          <div id="popin-select-team-container">
-            <div class="select-team-form">
-              <button class="select-team-btn" data-team-key="equipea">${nomcluba}</button>
-              <button class="select-team-btn" data-team-key="equipex">${nomclubx}</button>
-            </div>
-            <fieldset class="options">
-              <legend>Options</legend>
-              <div class="template-options">
-                <div class="template-option">
-                  <input type="radio" id="template-option-small" name="template" value="small" checked />
-                  <label for="template-option-small">Format court</label>
+                <div id="popin-select-team-container">
+                  <div class="select-team-form">
+                    <button class="select-team-btn" data-team-key="equipea">${nomcluba}</button>
+                    <button class="select-team-btn" data-team-key="equipex">${nomclubx}</button>
+                  </div>
+                  <fieldset class="options">
+                    <legend>Options</legend>
+                    <div class="template-options">
+                      <div class="template-option">
+                        <input type="radio" id="template-option-small" name="template" value="small" checked />
+                        <label for="template-option-small">Format court</label>
+                      </div>
+                      <div class="template-option">
+                        <input type="radio" id="template-option-prompt" name="template" value="prompt"/>
+                        <label for="template-option-prompt">Format prompt pour ChatGPT</label>
+                      </div>
+                    </div>
+                  </fieldset>
                 </div>
-                <div class="template-option">
-                  <input type="radio" id="template-option-prompt" name="template" value="prompt"/>
-                  <label for="template-option-prompt">Format prompt pour ChatGPT</label>
-                </div>
-              </div>
-            </fieldset>
-          </div> 
-        `;
+              `;
         popin.open(html, title);
         document.querySelectorAll(".select-team-btn").forEach((element) => {
           element.addEventListener("click", (event) => {
@@ -1033,610 +1039,610 @@ Si un joueur perd contre un joueur beaucoup moins bien classé que nous, le joue
       };
 
       const xmlTestStr = `<?xml version="1.0" encoding="ISO-8859-1"?>
-<liste>
-    <recto>
-        <typeFeuille>
-            <IDFEUILLE>3</IDFEUILLE>
-            <ONGLET>BOULOGNE BILLAN 9 / TRIFFOUILLIS-LES-OIES</ONGLET>
-            <NUMEROJOURNEE>6</NUMEROJOURNEE>
-            <LETTRECLUBRECEVANT>A</LETTRECLUBRECEVANT>
-            <ARBITRAGEPARTAGE>0</ARBITRAGEPARTAGE>
-            <CODEFEUILLE>4014</CODEFEUILLE>
-            <GENREFEUILLE>AW-BX-CY-DZ-AX-BW-DY-CZ-double 1-double 2-AY-CW-DX-BZ</GENREFEUILLE>
-            <SCOREACQUIS>0</SCOREACQUIS>
-            <NOMJA>MARTIN</NOMJA>
-            <PRENOMJA>Barnabé</PRENOMJA>
-            <EMAILJA></EMAILJA>
-            <TELDOMJA></TELDOMJA>
-            <TELMOBJA></TELMOBJA>
-            <EXPORTMAILJA>1</EXPORTMAILJA>
-            <NUMEROLICENCEJA>92471856</NUMEROLICENCEJA>
-            <NUMEROCLUBJA>08920067</NUMEROCLUBJA>
-            <NOMCLUBJA>TRIFFOUILLIS-LES-OIES</NOMCLUBJA>
-            <LIEURENCONTRE>BOULOGNE BILLANCOURT</LIEURENCONTRE>
-            <LIGUERENCONTRE>HAUTS DE SEINE</LIGUERENCONTRE>
-            <DATERENCONTRE>29/11/2024</DATERENCONTRE>
-            <HEURERENCONTRE>20H30</HEURERENCONTRE>
-            <DIVISIONRENCONTRE>D1MP1</DIVISIONRENCONTRE>
-            <POULERENCONTRE>5</POULERENCONTRE>
-            <NIVEAURENCONTRE>Départemental</NIVEAURENCONTRE>
-            <GENRERENCONTRE>Masculin</GENRERENCONTRE>
-            <PHASE>1</PHASE>
-            <TITREGENERAL>Championnat par Equipes</TITREGENERAL>
-            <DATETHEORIQUE>29/11/2024</DATETHEORIQUE>
-            <CATEGAUTORISEES>
-                -10|-11|-12|-13|-14|-15|-16|-17|-18|-20|-21|-40|-19|40+|45+|50+|55+|60+|65+|70+|75+|80+|85+|90+</CATEGAUTORISEES>
-        </typeFeuille>
-        <equipeA>
-            <NUMEROCLUB>08920049</NUMEROCLUB>
-            <NOMCLUB>BOULOGNE BILLANCOURT AC</NOMCLUB>
-            <NUMEROENTENTE></NUMEROENTENTE>
-            <NOMENTENTE></NOMENTENTE>
-            <NUMEROEQUIPE>9</NUMEROEQUIPE>
-            <NOMCAPITAINE>LANGLOIS</NOMCAPITAINE>
-            <PRENOMCAPITAINE>Xavier</PRENOMCAPITAINE>
-            <NUMEROLICENCECAPITAINE>9243345</NUMEROLICENCECAPITAINE>
-            <DOUBLE1>BC</DOUBLE1>
-            <DOUBLE2>AD</DOUBLE2>
-            <DOUBLE3></DOUBLE3>
-            <TOTALPOINTS>20</TOTALPOINTS>
-            <SETS>22</SETS>
-            <DETAILPOINTS>425</DETAILPOINTS>
-            <FORFAIT>0</FORFAIT>
-            <MAILCOR>contact@acbb-tt.fr</MAILCOR>
-            <NOMCOR>CAMION CYRIL /</NOMCOR>
-            <PRENOMCOR>Lethorel Serge</PRENOMCOR>
-            <TELCOR></TELCOR>
-            <JOUEUR1>
-                <NUMEROLICENCEJOUEUR>9255342</NUMEROLICENCEJOUEUR>
-                <NOMJOUEUR>CHOMAT</NOMJOUEUR>
-                <PRENOMJOUEUR>Raphael</PRENOMJOUEUR>
-                <POINTSCLASSEMENTSJOUEUR>682</POINTSCLASSEMENTSJOUEUR>
-                <DATEMUTATIONJOUEUR></DATEMUTATIONJOUEUR>
-                <NATIONALITEJOUEUR>F</NATIONALITEJOUEUR>
-                <CATEGORIEJOUEUR>-18</CATEGORIEJOUEUR>
-                <CATEGORIEADMINISTRATIVEJOUEUR>JUN</CATEGORIEADMINISTRATIVEJOUEUR>
-                <TYPELICENCEJOUEUR>T</TYPELICENCEJOUEUR>
-                <DATEVALIDATIONLICENCEJOUEUR>12/09/2024</DATEVALIDATIONLICENCEJOUEUR>
-                <CARTONS></CARTONS>
-                <CERTIFICAT>C</CERTIFICAT>
-                <NAISSANCE>18/06/2007</NAISSANCE>
-            </JOUEUR1>
-            <JOUEUR2>
-                <NUMEROLICENCEJOUEUR>9243345</NUMEROLICENCEJOUEUR>
-                <NOMJOUEUR>LANGLOIS</NOMJOUEUR>
-                <PRENOMJOUEUR>Xavier</PRENOMJOUEUR>
-                <POINTSCLASSEMENTSJOUEUR>626</POINTSCLASSEMENTSJOUEUR>
-                <DATEMUTATIONJOUEUR></DATEMUTATIONJOUEUR>
-                <NATIONALITEJOUEUR>F</NATIONALITEJOUEUR>
-                <CATEGORIEJOUEUR>40+</CATEGORIEJOUEUR>
-                <CATEGORIEADMINISTRATIVEJOUEUR>VET</CATEGORIEADMINISTRATIVEJOUEUR>
-                <TYPELICENCEJOUEUR>T</TYPELICENCEJOUEUR>
-                <DATEVALIDATIONLICENCEJOUEUR>12/09/2024</DATEVALIDATIONLICENCEJOUEUR>
-                <CARTONS></CARTONS>
-                <CERTIFICAT>C</CERTIFICAT>
-                <NAISSANCE>15/01/1980</NAISSANCE>
-            </JOUEUR2>
-            <JOUEUR3>
-                <NUMEROLICENCEJOUEUR>9218735</NUMEROLICENCEJOUEUR>
-                <NOMJOUEUR>DEGUIL</NOMJOUEUR>
-                <PRENOMJOUEUR>Christophe</PRENOMJOUEUR>
-                <POINTSCLASSEMENTSJOUEUR>781</POINTSCLASSEMENTSJOUEUR>
-                <DATEMUTATIONJOUEUR></DATEMUTATIONJOUEUR>
-                <NATIONALITEJOUEUR>F</NATIONALITEJOUEUR>
-                <CATEGORIEJOUEUR>55+</CATEGORIEJOUEUR>
-                <CATEGORIEADMINISTRATIVEJOUEUR>VET</CATEGORIEADMINISTRATIVEJOUEUR>
-                <TYPELICENCEJOUEUR>T</TYPELICENCEJOUEUR>
-                <DATEVALIDATIONLICENCEJOUEUR>01/10/2024</DATEVALIDATIONLICENCEJOUEUR>
-                <CARTONS></CARTONS>
-                <CERTIFICAT>C</CERTIFICAT>
-                <NAISSANCE>08/06/1967</NAISSANCE>
-            </JOUEUR3>
-            <JOUEUR4>
-                <NUMEROLICENCEJOUEUR>9250807</NUMEROLICENCEJOUEUR>
-                <NOMJOUEUR>AUBERT</NOMJOUEUR>
-                <PRENOMJOUEUR>Richard</PRENOMJOUEUR>
-                <POINTSCLASSEMENTSJOUEUR>767</POINTSCLASSEMENTSJOUEUR>
-                <DATEMUTATIONJOUEUR></DATEMUTATIONJOUEUR>
-                <NATIONALITEJOUEUR>F</NATIONALITEJOUEUR>
-                <CATEGORIEJOUEUR>-13</CATEGORIEJOUEUR>
-                <CATEGORIEADMINISTRATIVEJOUEUR>MIN</CATEGORIEADMINISTRATIVEJOUEUR>
-                <TYPELICENCEJOUEUR>T</TYPELICENCEJOUEUR>
-                <DATEVALIDATIONLICENCEJOUEUR>06/09/2024</DATEVALIDATIONLICENCEJOUEUR>
-                <CARTONS></CARTONS>
-                <CERTIFICAT>C</CERTIFICAT>
-                <NAISSANCE>11/01/2012</NAISSANCE>
-            </JOUEUR4>
-        </equipeA>
-        <equipeX>
-            <NUMEROCLUB>08920067</NUMEROCLUB>
-            <NOMCLUB>TRIFFOUILLIS-LES-OIES</NOMCLUB>
-            <NUMEROENTENTE></NUMEROENTENTE>
-            <NOMENTENTE></NOMENTENTE>
-            <NUMEROEQUIPE>3</NUMEROEQUIPE>
-            <NOMCAPITAINE>MARTIN</NOMCAPITAINE>
-            <PRENOMCAPITAINE>Barnabé</PRENOMCAPITAINE>
-            <NUMEROLICENCECAPITAINE>92471856</NUMEROLICENCECAPITAINE>
-            <DOUBLE1>XZ</DOUBLE1>
-            <DOUBLE2>WY</DOUBLE2>
-            <DOUBLE3></DOUBLE3>
-            <TOTALPOINTS>22</TOTALPOINTS>
-            <SETS>26</SETS>
-            <DETAILPOINTS>454</DETAILPOINTS>
-            <FORFAIT>0</FORFAIT>
-            <MAILCOR>pruvost.l@gmail.com</MAILCOR>
-            <NOMCOR>PRUVOST</NOMCOR>
-            <PRENOMCOR>Laurent</PRENOMCOR>
-            <TELCOR>0615051554</TELCOR>
-            <JOUEUR1>
-                <NUMEROLICENCEJOUEUR>9228222</NUMEROLICENCEJOUEUR>
-                <NOMJOUEUR>BLANC</NOMJOUEUR>
-                <PRENOMJOUEUR>Joseph</PRENOMJOUEUR>
-                <POINTSCLASSEMENTSJOUEUR>1667</POINTSCLASSEMENTSJOUEUR>
-                <DATEMUTATIONJOUEUR></DATEMUTATIONJOUEUR>
-                <NATIONALITEJOUEUR>F</NATIONALITEJOUEUR>
-                <CATEGORIEJOUEUR>-40</CATEGORIEJOUEUR>
-                <CATEGORIEADMINISTRATIVEJOUEUR>SEN</CATEGORIEADMINISTRATIVEJOUEUR>
-                <TYPELICENCEJOUEUR>T</TYPELICENCEJOUEUR>
-                <DATEVALIDATIONLICENCEJOUEUR>13/09/2024</DATEVALIDATIONLICENCEJOUEUR>
-                <CARTONS></CARTONS>
-                <CERTIFICAT>C</CERTIFICAT>
-                <NAISSANCE>01/03/1996</NAISSANCE>
-            </JOUEUR1>
-            <JOUEUR2>
-                <NUMEROLICENCEJOUEUR>92471856</NUMEROLICENCEJOUEUR>
-                <NOMJOUEUR>MARTIN</NOMJOUEUR>
-                <PRENOMJOUEUR>Barnabé</PRENOMJOUEUR>
-                <POINTSCLASSEMENTSJOUEUR>860</POINTSCLASSEMENTSJOUEUR>
-                <DATEMUTATIONJOUEUR></DATEMUTATIONJOUEUR>
-                <NATIONALITEJOUEUR>F</NATIONALITEJOUEUR>
-                <CATEGORIEJOUEUR>50+</CATEGORIEJOUEUR>
-                <CATEGORIEADMINISTRATIVEJOUEUR>VET</CATEGORIEADMINISTRATIVEJOUEUR>
-                <TYPELICENCEJOUEUR>A</TYPELICENCEJOUEUR>
-                <DATEVALIDATIONLICENCEJOUEUR>08/07/2024</DATEVALIDATIONLICENCEJOUEUR>
-                <CARTONS></CARTONS>
-                <CERTIFICAT>C</CERTIFICAT>
-                <NAISSANCE>05/10/1972</NAISSANCE>
-            </JOUEUR2>
-            <JOUEUR3>
-                <NUMEROLICENCEJOUEUR>9255667</NUMEROLICENCEJOUEUR>
-                <NOMJOUEUR>CHOLET</NOMJOUEUR>
-                <PRENOMJOUEUR>Damien</PRENOMJOUEUR>
-                <POINTSCLASSEMENTSJOUEUR>663</POINTSCLASSEMENTSJOUEUR>
-                <DATEMUTATIONJOUEUR></DATEMUTATIONJOUEUR>
-                <NATIONALITEJOUEUR>F</NATIONALITEJOUEUR>
-                <CATEGORIEJOUEUR>65+</CATEGORIEJOUEUR>
-                <CATEGORIEADMINISTRATIVEJOUEUR>VET</CATEGORIEADMINISTRATIVEJOUEUR>
-                <TYPELICENCEJOUEUR>T</TYPELICENCEJOUEUR>
-                <DATEVALIDATIONLICENCEJOUEUR>18/09/2024</DATEVALIDATIONLICENCEJOUEUR>
-                <CARTONS></CARTONS>
-                <CERTIFICAT>C</CERTIFICAT>
-                <NAISSANCE>28/09/1958</NAISSANCE>
-            </JOUEUR3>
-            <JOUEUR4>
-                <NUMEROLICENCEJOUEUR>9243263</NUMEROLICENCEJOUEUR>
-                <NOMJOUEUR>YOUPLA</NOMJOUEUR>
-                <PRENOMJOUEUR>Boum</PRENOMJOUEUR>
-                <POINTSCLASSEMENTSJOUEUR>916</POINTSCLASSEMENTSJOUEUR>
-                <DATEMUTATIONJOUEUR></DATEMUTATIONJOUEUR>
-                <NATIONALITEJOUEUR>F</NATIONALITEJOUEUR>
-                <CATEGORIEJOUEUR>-40</CATEGORIEJOUEUR>
-                <CATEGORIEADMINISTRATIVEJOUEUR>SEN</CATEGORIEADMINISTRATIVEJOUEUR>
-                <TYPELICENCEJOUEUR>T</TYPELICENCEJOUEUR>
-                <DATEVALIDATIONLICENCEJOUEUR>13/09/2024</DATEVALIDATIONLICENCEJOUEUR>
-                <CARTONS></CARTONS>
-                <CERTIFICAT>C</CERTIFICAT>
-                <NAISSANCE>16/05/2000</NAISSANCE>
-            </JOUEUR4>
-        </equipeX>
-        <parties>
-            <PARTIE1>
-                <LETTREA>A</LETTREA>
-                <JOUEURA>CHOMAT Raphael</JOUEURA>
-                <LETTREX>W</LETTREX>
-                <JOUEURX>BLANC Joseph</JOUEURX>
-                <MANCHE1>-04</MANCHE1>
-                <MANCHE2>-00</MANCHE2>
-                <MANCHE3>-06</MANCHE3>
-                <MANCHE4></MANCHE4>
-                <MANCHE5></MANCHE5>
-                <MANCHE6></MANCHE6>
-                <MANCHE7></MANCHE7>
-                <POINTSA>1</POINTSA>
-                <POINTSX>2</POINTSX>
-                <CODEREMARQUE1>1</CODEREMARQUE1>
-                <REMARQUE1>partie jouée</REMARQUE1>
-                <CODEREMARQUE2></CODEREMARQUE2>
-                <REMARQUE2></REMARQUE2>
-            </PARTIE1>
-            <PARTIE2>
-                <LETTREA>B</LETTREA>
-                <JOUEURA>LANGLOIS Xavier</JOUEURA>
-                <LETTREX>X</LETTREX>
-                <JOUEURX>MARTIN Barnabé</JOUEURX>
-                <MANCHE1>-09</MANCHE1>
-                <MANCHE2>-05</MANCHE2>
-                <MANCHE3>-09</MANCHE3>
-                <MANCHE4></MANCHE4>
-                <MANCHE5></MANCHE5>
-                <MANCHE6></MANCHE6>
-                <MANCHE7></MANCHE7>
-                <POINTSA>1</POINTSA>
-                <POINTSX>2</POINTSX>
-                <CODEREMARQUE1>1</CODEREMARQUE1>
-                <REMARQUE1>partie jouée</REMARQUE1>
-                <CODEREMARQUE2></CODEREMARQUE2>
-                <REMARQUE2></REMARQUE2>
-            </PARTIE2>
-            <PARTIE3>
-                <LETTREA>C</LETTREA>
-                <JOUEURA>DEGUIL Christophe</JOUEURA>
-                <LETTREX>Y</LETTREX>
-                <JOUEURX>CHOLET Damien</JOUEURX>
-                <MANCHE1>-09</MANCHE1>
-                <MANCHE2>-10</MANCHE2>
-                <MANCHE3>-15</MANCHE3>
-                <MANCHE4></MANCHE4>
-                <MANCHE5></MANCHE5>
-                <MANCHE6></MANCHE6>
-                <MANCHE7></MANCHE7>
-                <POINTSA>1</POINTSA>
-                <POINTSX>2</POINTSX>
-                <CODEREMARQUE1>1</CODEREMARQUE1>
-                <REMARQUE1>partie jouée</REMARQUE1>
-                <CODEREMARQUE2></CODEREMARQUE2>
-                <REMARQUE2></REMARQUE2>
-            </PARTIE3>
-            <PARTIE4>
-                <LETTREA>D</LETTREA>
-                <JOUEURA>AUBERT Richard</JOUEURA>
-                <LETTREX>Z</LETTREX>
-                <JOUEURX>YOUPLA Boum</JOUEURX>
-                <MANCHE1>06</MANCHE1>
-                <MANCHE2>06</MANCHE2>
-                <MANCHE3>10</MANCHE3>
-                <MANCHE4></MANCHE4>
-                <MANCHE5></MANCHE5>
-                <MANCHE6></MANCHE6>
-                <MANCHE7></MANCHE7>
-                <POINTSA>2</POINTSA>
-                <POINTSX>1</POINTSX>
-                <CODEREMARQUE1>1</CODEREMARQUE1>
-                <REMARQUE1>partie jouée</REMARQUE1>
-                <CODEREMARQUE2></CODEREMARQUE2>
-                <REMARQUE2></REMARQUE2>
-            </PARTIE4>
-            <PARTIE5>
-                <LETTREA>A</LETTREA>
-                <JOUEURA>CHOMAT Raphael</JOUEURA>
-                <LETTREX>X</LETTREX>
-                <JOUEURX>MARTIN Barnabé</JOUEURX>
-                <MANCHE1>05</MANCHE1>
-                <MANCHE2>10</MANCHE2>
-                <MANCHE3>08</MANCHE3>
-                <MANCHE4></MANCHE4>
-                <MANCHE5></MANCHE5>
-                <MANCHE6></MANCHE6>
-                <MANCHE7></MANCHE7>
-                <POINTSA>2</POINTSA>
-                <POINTSX>1</POINTSX>
-                <CODEREMARQUE1>1</CODEREMARQUE1>
-                <REMARQUE1>partie jouée</REMARQUE1>
-                <CODEREMARQUE2></CODEREMARQUE2>
-                <REMARQUE2></REMARQUE2>
-            </PARTIE5>
-            <PARTIE6>
-                <LETTREA>B</LETTREA>
-                <JOUEURA>LANGLOIS Xavier</JOUEURA>
-                <LETTREX>W</LETTREX>
-                <JOUEURX>BLANC Joseph</JOUEURX>
-                <MANCHE1>-06</MANCHE1>
-                <MANCHE2>-07</MANCHE2>
-                <MANCHE3>-04</MANCHE3>
-                <MANCHE4></MANCHE4>
-                <MANCHE5></MANCHE5>
-                <MANCHE6></MANCHE6>
-                <MANCHE7></MANCHE7>
-                <POINTSA>1</POINTSA>
-                <POINTSX>2</POINTSX>
-                <CODEREMARQUE1>1</CODEREMARQUE1>
-                <REMARQUE1>partie jouée</REMARQUE1>
-                <CODEREMARQUE2></CODEREMARQUE2>
-                <REMARQUE2></REMARQUE2>
-            </PARTIE6>
-            <PARTIE7>
-                <LETTREA>D</LETTREA>
-                <JOUEURA>AUBERT Richard</JOUEURA>
-                <LETTREX>Y</LETTREX>
-                <JOUEURX>CHOLET Damien</JOUEURX>
-                <MANCHE1>08</MANCHE1>
-                <MANCHE2>06</MANCHE2>
-                <MANCHE3>05</MANCHE3>
-                <MANCHE4></MANCHE4>
-                <MANCHE5></MANCHE5>
-                <MANCHE6></MANCHE6>
-                <MANCHE7></MANCHE7>
-                <POINTSA>2</POINTSA>
-                <POINTSX>1</POINTSX>
-                <CODEREMARQUE1>1</CODEREMARQUE1>
-                <REMARQUE1>partie jouée</REMARQUE1>
-                <CODEREMARQUE2></CODEREMARQUE2>
-                <REMARQUE2></REMARQUE2>
-            </PARTIE7>
-            <PARTIE8>
-                <LETTREA>C</LETTREA>
-                <JOUEURA>DEGUIL Christophe</JOUEURA>
-                <LETTREX>Z</LETTREX>
-                <JOUEURX>YOUPLA Boum</JOUEURX>
-                <MANCHE1>05</MANCHE1>
-                <MANCHE2>07</MANCHE2>
-                <MANCHE3>-06</MANCHE3>
-                <MANCHE4>05</MANCHE4>
-                <MANCHE5></MANCHE5>
-                <MANCHE6></MANCHE6>
-                <MANCHE7></MANCHE7>
-                <POINTSA>2</POINTSA>
-                <POINTSX>1</POINTSX>
-                <CODEREMARQUE1>1</CODEREMARQUE1>
-                <REMARQUE1>partie jouée</REMARQUE1>
-                <CODEREMARQUE2></CODEREMARQUE2>
-                <REMARQUE2></REMARQUE2>
-            </PARTIE8>
-            <PARTIE9>
-                <LETTREA>BC</LETTREA>
-                <JOUEURA>LANGLOIS Xavier / DEGUIL Christophe</JOUEURA>
-                <LETTREX>XZ</LETTREX>
-                <JOUEURX>MARTIN Barnabé / YOUPLA Boum</JOUEURX>
-                <MANCHE1>-08</MANCHE1>
-                <MANCHE2>-05</MANCHE2>
-                <MANCHE3>-09</MANCHE3>
-                <MANCHE4></MANCHE4>
-                <MANCHE5></MANCHE5>
-                <MANCHE6></MANCHE6>
-                <MANCHE7></MANCHE7>
-                <POINTSA>1</POINTSA>
-                <POINTSX>2</POINTSX>
-                <CODEREMARQUE1>1</CODEREMARQUE1>
-                <REMARQUE1>partie jouée</REMARQUE1>
-                <CODEREMARQUE2></CODEREMARQUE2>
-                <REMARQUE2></REMARQUE2>
-            </PARTIE9>
-            <PARTIE10>
-                <LETTREA>AD</LETTREA>
-                <JOUEURA>CHOMAT Raphael / AUBERT Richard</JOUEURA>
-                <LETTREX>WY</LETTREX>
-                <JOUEURX>BLANC Joseph / CHOLET Damien</JOUEURX>
-                <MANCHE1>07</MANCHE1>
-                <MANCHE2>-12</MANCHE2>
-                <MANCHE3>-05</MANCHE3>
-                <MANCHE4>09</MANCHE4>
-                <MANCHE5>-08</MANCHE5>
-                <MANCHE6></MANCHE6>
-                <MANCHE7></MANCHE7>
-                <POINTSA>1</POINTSA>
-                <POINTSX>2</POINTSX>
-                <CODEREMARQUE1>1</CODEREMARQUE1>
-                <REMARQUE1>partie jouée</REMARQUE1>
-                <CODEREMARQUE2></CODEREMARQUE2>
-                <REMARQUE2></REMARQUE2>
-            </PARTIE10>
-            <PARTIE11>
-                <LETTREA>A</LETTREA>
-                <JOUEURA>CHOMAT Raphael</JOUEURA>
-                <LETTREX>Y</LETTREX>
-                <JOUEURX>CHOLET Damien</JOUEURX>
-                <MANCHE1>08</MANCHE1>
-                <MANCHE2>07</MANCHE2>
-                <MANCHE3>06</MANCHE3>
-                <MANCHE4></MANCHE4>
-                <MANCHE5></MANCHE5>
-                <MANCHE6></MANCHE6>
-                <MANCHE7></MANCHE7>
-                <POINTSA>2</POINTSA>
-                <POINTSX>1</POINTSX>
-                <CODEREMARQUE1>1</CODEREMARQUE1>
-                <REMARQUE1>partie jouée</REMARQUE1>
-                <CODEREMARQUE2></CODEREMARQUE2>
-                <REMARQUE2></REMARQUE2>
-            </PARTIE11>
-            <PARTIE12>
-                <LETTREA>C</LETTREA>
-                <JOUEURA>DEGUIL Christophe</JOUEURA>
-                <LETTREX>W</LETTREX>
-                <JOUEURX>BLANC Joseph</JOUEURX>
-                <MANCHE1>-01</MANCHE1>
-                <MANCHE2>-03</MANCHE2>
-                <MANCHE3>-07</MANCHE3>
-                <MANCHE4></MANCHE4>
-                <MANCHE5></MANCHE5>
-                <MANCHE6></MANCHE6>
-                <MANCHE7></MANCHE7>
-                <POINTSA>1</POINTSA>
-                <POINTSX>2</POINTSX>
-                <CODEREMARQUE1>1</CODEREMARQUE1>
-                <REMARQUE1>partie jouée</REMARQUE1>
-                <CODEREMARQUE2></CODEREMARQUE2>
-                <REMARQUE2></REMARQUE2>
-            </PARTIE12>
-            <PARTIE13>
-                <LETTREA>D</LETTREA>
-                <JOUEURA>AUBERT Richard</JOUEURA>
-                <LETTREX>X</LETTREX>
-                <JOUEURX>MARTIN Barnabé</JOUEURX>
-                <MANCHE1>06</MANCHE1>
-                <MANCHE2>-05</MANCHE2>
-                <MANCHE3>11</MANCHE3>
-                <MANCHE4>09</MANCHE4>
-                <MANCHE5></MANCHE5>
-                <MANCHE6></MANCHE6>
-                <MANCHE7></MANCHE7>
-                <POINTSA>2</POINTSA>
-                <POINTSX>1</POINTSX>
-                <CODEREMARQUE1>1</CODEREMARQUE1>
-                <REMARQUE1>partie jouée</REMARQUE1>
-                <CODEREMARQUE2></CODEREMARQUE2>
-                <REMARQUE2></REMARQUE2>
-            </PARTIE13>
-            <PARTIE14>
-                <LETTREA>B</LETTREA>
-                <JOUEURA>LANGLOIS Xavier</JOUEURA>
-                <LETTREX>Z</LETTREX>
-                <JOUEURX>YOUPLA Boum</JOUEURX>
-                <MANCHE1>06</MANCHE1>
-                <MANCHE2>-09</MANCHE2>
-                <MANCHE3>-08</MANCHE3>
-                <MANCHE4>08</MANCHE4>
-                <MANCHE5>-09</MANCHE5>
-                <MANCHE6></MANCHE6>
-                <MANCHE7></MANCHE7>
-                <POINTSA>1</POINTSA>
-                <POINTSX>2</POINTSX>
-                <CODEREMARQUE1>1</CODEREMARQUE1>
-                <REMARQUE1>partie jouée</REMARQUE1>
-                <CODEREMARQUE2></CODEREMARQUE2>
-                <REMARQUE2></REMARQUE2>
-            </PARTIE14>
-        </parties>
-    </recto>
-    <verso>
-        <cartons>
-            <CARTON1>
-                <NOM></NOM>
-                <ASSOCIATION></ASSOCIATION>
-                <JAUNE></JAUNE>
-                <JAUNEROUGE1></JAUNEROUGE1>
-                <JAUNEROUGE2></JAUNEROUGE2>
-                <ROUGE></ROUGE>
-                <MOTIF></MOTIF>
-            </CARTON1>
-            <CARTON2>
-                <NOM></NOM>
-                <ASSOCIATION></ASSOCIATION>
-                <JAUNE></JAUNE>
-                <JAUNEROUGE1></JAUNEROUGE1>
-                <JAUNEROUGE2></JAUNEROUGE2>
-                <ROUGE></ROUGE>
-                <MOTIF></MOTIF>
-            </CARTON2>
-            <CARTON3>
-                <NOM></NOM>
-                <ASSOCIATION></ASSOCIATION>
-                <JAUNE></JAUNE>
-                <JAUNEROUGE1></JAUNEROUGE1>
-                <JAUNEROUGE2></JAUNEROUGE2>
-                <ROUGE></ROUGE>
-                <MOTIF></MOTIF>
-            </CARTON3>
-            <CARTON4>
-                <NOM></NOM>
-                <ASSOCIATION></ASSOCIATION>
-                <JAUNE></JAUNE>
-                <JAUNEROUGE1></JAUNEROUGE1>
-                <JAUNEROUGE2></JAUNEROUGE2>
-                <ROUGE></ROUGE>
-                <MOTIF></MOTIF>
-            </CARTON4>
-            <CARTON5>
-                <NOM></NOM>
-                <ASSOCIATION></ASSOCIATION>
-                <JAUNE></JAUNE>
-                <JAUNEROUGE1></JAUNEROUGE1>
-                <JAUNEROUGE2></JAUNEROUGE2>
-                <ROUGE></ROUGE>
-                <MOTIF></MOTIF>
-            </CARTON5>
-            <CARTON6>
-                <NOM></NOM>
-                <ASSOCIATION></ASSOCIATION>
-                <JAUNE></JAUNE>
-                <JAUNEROUGE1></JAUNEROUGE1>
-                <JAUNEROUGE2></JAUNEROUGE2>
-                <ROUGE></ROUGE>
-                <MOTIF></MOTIF>
-            </CARTON6>
-            <CARTON7>
-                <NOM></NOM>
-                <ASSOCIATION></ASSOCIATION>
-                <JAUNE></JAUNE>
-                <JAUNEROUGE1></JAUNEROUGE1>
-                <JAUNEROUGE2></JAUNEROUGE2>
-                <ROUGE></ROUGE>
-                <MOTIF></MOTIF>
-            </CARTON7>
-            <CARTON8>
-                <NOM></NOM>
-                <ASSOCIATION></ASSOCIATION>
-                <JAUNE></JAUNE>
-                <JAUNEROUGE1></JAUNEROUGE1>
-                <JAUNEROUGE2></JAUNEROUGE2>
-                <ROUGE></ROUGE>
-                <MOTIF></MOTIF>
-            </CARTON8>
-            <CARTON9>
-                <NOM></NOM>
-                <ASSOCIATION></ASSOCIATION>
-                <JAUNE></JAUNE>
-                <JAUNEROUGE1></JAUNEROUGE1>
-                <JAUNEROUGE2></JAUNEROUGE2>
-                <ROUGE></ROUGE>
-                <MOTIF></MOTIF>
-            </CARTON9>
-            <CARTON10>
-                <NOM></NOM>
-                <ASSOCIATION></ASSOCIATION>
-                <JAUNE></JAUNE>
-                <JAUNEROUGE1></JAUNEROUGE1>
-                <JAUNEROUGE2></JAUNEROUGE2>
-                <ROUGE></ROUGE>
-                <MOTIF></MOTIF>
-            </CARTON10>
-        </cartons>
-        <reserves>
-            <RESERVE1>
-                <CODEGENRE></CODEGENRE>
-                <GENRE></GENRE>
-                <HEURE></HEURE>
-                <MINUTE></MINUTE>
-                <SCOREA></SCOREA>
-                <SCOREX></SCOREX>
-                <NOTE></NOTE>
-                <DEPOT></DEPOT>
-            </RESERVE1>
-            <RESERVE2>
-                <CODEGENRE></CODEGENRE>
-                <GENRE></GENRE>
-                <HEURE></HEURE>
-                <MINUTE></MINUTE>
-                <SCOREA></SCOREA>
-                <SCOREX></SCOREX>
-                <NOTE></NOTE>
-                <DEPOT></DEPOT>
-            </RESERVE2>
-            <RESERVE3>
-                <CODEGENRE></CODEGENRE>
-                <GENRE></GENRE>
-                <HEURE></HEURE>
-                <MINUTE></MINUTE>
-                <SCOREA></SCOREA>
-                <SCOREX></SCOREX>
-                <NOTE></NOTE>
-                <DEPOT></DEPOT>
-            </RESERVE3>
-            <RESERVE4>
-                <CODEGENRE></CODEGENRE>
-                <GENRE></GENRE>
-                <HEURE></HEURE>
-                <MINUTE></MINUTE>
-                <SCOREA></SCOREA>
-                <SCOREX></SCOREX>
-                <NOTE></NOTE>
-                <DEPOT></DEPOT>
-            </RESERVE4>
-        </reserves>
-        <arbitres />
-        <RAPPORTJA></RAPPORTJA>
-    </verso>
-</liste>`;
+      <liste>
+          <recto>
+              <typeFeuille>
+                  <IDFEUILLE>3</IDFEUILLE>
+                  <ONGLET>BOULOGNE BILLAN 9 / TRIFFOUILLIS-LES-OIES</ONGLET>
+                  <NUMEROJOURNEE>6</NUMEROJOURNEE>
+                  <LETTRECLUBRECEVANT>A</LETTRECLUBRECEVANT>
+                  <ARBITRAGEPARTAGE>0</ARBITRAGEPARTAGE>
+                  <CODEFEUILLE>4014</CODEFEUILLE>
+                  <GENREFEUILLE>AW-BX-CY-DZ-AX-BW-DY-CZ-double 1-double 2-AY-CW-DX-BZ</GENREFEUILLE>
+                  <SCOREACQUIS>0</SCOREACQUIS>
+                  <NOMJA>MARTIN</NOMJA>
+                  <PRENOMJA>Barnabé</PRENOMJA>
+                  <EMAILJA></EMAILJA>
+                  <TELDOMJA></TELDOMJA>
+                  <TELMOBJA></TELMOBJA>
+                  <EXPORTMAILJA>1</EXPORTMAILJA>
+                  <NUMEROLICENCEJA>92471856</NUMEROLICENCEJA>
+                  <NUMEROCLUBJA>08920067</NUMEROCLUBJA>
+                  <NOMCLUBJA>TRIFFOUILLIS-LES-OIES</NOMCLUBJA>
+                  <LIEURENCONTRE>BOULOGNE BILLANCOURT</LIEURENCONTRE>
+                  <LIGUERENCONTRE>HAUTS DE SEINE</LIGUERENCONTRE>
+                  <DATERENCONTRE>29/11/2024</DATERENCONTRE>
+                  <HEURERENCONTRE>20H30</HEURERENCONTRE>
+                  <DIVISIONRENCONTRE>D1MP1</DIVISIONRENCONTRE>
+                  <POULERENCONTRE>5</POULERENCONTRE>
+                  <NIVEAURENCONTRE>Départemental</NIVEAURENCONTRE>
+                  <GENRERENCONTRE>Masculin</GENRERENCONTRE>
+                  <PHASE>1</PHASE>
+                  <TITREGENERAL>Championnat par Equipes</TITREGENERAL>
+                  <DATETHEORIQUE>29/11/2024</DATETHEORIQUE>
+                  <CATEGAUTORISEES>
+                      -10|-11|-12|-13|-14|-15|-16|-17|-18|-20|-21|-40|-19|40+|45+|50+|55+|60+|65+|70+|75+|80+|85+|90+</CATEGAUTORISEES>
+              </typeFeuille>
+              <equipeA>
+                  <NUMEROCLUB>08920049</NUMEROCLUB>
+                  <NOMCLUB>BOULOGNE BILLANCOURT AC</NOMCLUB>
+                  <NUMEROENTENTE></NUMEROENTENTE>
+                  <NOMENTENTE></NOMENTENTE>
+                  <NUMEROEQUIPE>9</NUMEROEQUIPE>
+                  <NOMCAPITAINE>LANGLOIS</NOMCAPITAINE>
+                  <PRENOMCAPITAINE>Xavier</PRENOMCAPITAINE>
+                  <NUMEROLICENCECAPITAINE>9243345</NUMEROLICENCECAPITAINE>
+                  <DOUBLE1>BC</DOUBLE1>
+                  <DOUBLE2>AD</DOUBLE2>
+                  <DOUBLE3></DOUBLE3>
+                  <TOTALPOINTS>20</TOTALPOINTS>
+                  <SETS>22</SETS>
+                  <DETAILPOINTS>425</DETAILPOINTS>
+                  <FORFAIT>0</FORFAIT>
+                  <MAILCOR>contact@acbb-tt.fr</MAILCOR>
+                  <NOMCOR>CAMION CYRIL /</NOMCOR>
+                  <PRENOMCOR>Lethorel Serge</PRENOMCOR>
+                  <TELCOR></TELCOR>
+                  <JOUEUR1>
+                      <NUMEROLICENCEJOUEUR>9255342</NUMEROLICENCEJOUEUR>
+                      <NOMJOUEUR>CHOMAT</NOMJOUEUR>
+                      <PRENOMJOUEUR>Raphael</PRENOMJOUEUR>
+                      <POINTSCLASSEMENTSJOUEUR>682</POINTSCLASSEMENTSJOUEUR>
+                      <DATEMUTATIONJOUEUR></DATEMUTATIONJOUEUR>
+                      <NATIONALITEJOUEUR>F</NATIONALITEJOUEUR>
+                      <CATEGORIEJOUEUR>-18</CATEGORIEJOUEUR>
+                      <CATEGORIEADMINISTRATIVEJOUEUR>JUN</CATEGORIEADMINISTRATIVEJOUEUR>
+                      <TYPELICENCEJOUEUR>T</TYPELICENCEJOUEUR>
+                      <DATEVALIDATIONLICENCEJOUEUR>12/09/2024</DATEVALIDATIONLICENCEJOUEUR>
+                      <CARTONS></CARTONS>
+                      <CERTIFICAT>C</CERTIFICAT>
+                      <NAISSANCE>18/06/2007</NAISSANCE>
+                  </JOUEUR1>
+                  <JOUEUR2>
+                      <NUMEROLICENCEJOUEUR>9243345</NUMEROLICENCEJOUEUR>
+                      <NOMJOUEUR>LANGLOIS</NOMJOUEUR>
+                      <PRENOMJOUEUR>Xavier</PRENOMJOUEUR>
+                      <POINTSCLASSEMENTSJOUEUR>626</POINTSCLASSEMENTSJOUEUR>
+                      <DATEMUTATIONJOUEUR></DATEMUTATIONJOUEUR>
+                      <NATIONALITEJOUEUR>F</NATIONALITEJOUEUR>
+                      <CATEGORIEJOUEUR>40+</CATEGORIEJOUEUR>
+                      <CATEGORIEADMINISTRATIVEJOUEUR>VET</CATEGORIEADMINISTRATIVEJOUEUR>
+                      <TYPELICENCEJOUEUR>T</TYPELICENCEJOUEUR>
+                      <DATEVALIDATIONLICENCEJOUEUR>12/09/2024</DATEVALIDATIONLICENCEJOUEUR>
+                      <CARTONS></CARTONS>
+                      <CERTIFICAT>C</CERTIFICAT>
+                      <NAISSANCE>15/01/1980</NAISSANCE>
+                  </JOUEUR2>
+                  <JOUEUR3>
+                      <NUMEROLICENCEJOUEUR>9218735</NUMEROLICENCEJOUEUR>
+                      <NOMJOUEUR>DEGUIL</NOMJOUEUR>
+                      <PRENOMJOUEUR>Christophe</PRENOMJOUEUR>
+                      <POINTSCLASSEMENTSJOUEUR>781</POINTSCLASSEMENTSJOUEUR>
+                      <DATEMUTATIONJOUEUR></DATEMUTATIONJOUEUR>
+                      <NATIONALITEJOUEUR>F</NATIONALITEJOUEUR>
+                      <CATEGORIEJOUEUR>55+</CATEGORIEJOUEUR>
+                      <CATEGORIEADMINISTRATIVEJOUEUR>VET</CATEGORIEADMINISTRATIVEJOUEUR>
+                      <TYPELICENCEJOUEUR>T</TYPELICENCEJOUEUR>
+                      <DATEVALIDATIONLICENCEJOUEUR>01/10/2024</DATEVALIDATIONLICENCEJOUEUR>
+                      <CARTONS></CARTONS>
+                      <CERTIFICAT>C</CERTIFICAT>
+                      <NAISSANCE>08/06/1967</NAISSANCE>
+                  </JOUEUR3>
+                  <JOUEUR4>
+                      <NUMEROLICENCEJOUEUR>9250807</NUMEROLICENCEJOUEUR>
+                      <NOMJOUEUR>AUBERT</NOMJOUEUR>
+                      <PRENOMJOUEUR>Richard</PRENOMJOUEUR>
+                      <POINTSCLASSEMENTSJOUEUR>767</POINTSCLASSEMENTSJOUEUR>
+                      <DATEMUTATIONJOUEUR></DATEMUTATIONJOUEUR>
+                      <NATIONALITEJOUEUR>F</NATIONALITEJOUEUR>
+                      <CATEGORIEJOUEUR>-13</CATEGORIEJOUEUR>
+                      <CATEGORIEADMINISTRATIVEJOUEUR>MIN</CATEGORIEADMINISTRATIVEJOUEUR>
+                      <TYPELICENCEJOUEUR>T</TYPELICENCEJOUEUR>
+                      <DATEVALIDATIONLICENCEJOUEUR>06/09/2024</DATEVALIDATIONLICENCEJOUEUR>
+                      <CARTONS></CARTONS>
+                      <CERTIFICAT>C</CERTIFICAT>
+                      <NAISSANCE>11/01/2012</NAISSANCE>
+                  </JOUEUR4>
+              </equipeA>
+              <equipeX>
+                  <NUMEROCLUB>08920067</NUMEROCLUB>
+                  <NOMCLUB>TRIFFOUILLIS-LES-OIES</NOMCLUB>
+                  <NUMEROENTENTE></NUMEROENTENTE>
+                  <NOMENTENTE></NOMENTENTE>
+                  <NUMEROEQUIPE>3</NUMEROEQUIPE>
+                  <NOMCAPITAINE>MARTIN</NOMCAPITAINE>
+                  <PRENOMCAPITAINE>Barnabé</PRENOMCAPITAINE>
+                  <NUMEROLICENCECAPITAINE>92471856</NUMEROLICENCECAPITAINE>
+                  <DOUBLE1>XZ</DOUBLE1>
+                  <DOUBLE2>WY</DOUBLE2>
+                  <DOUBLE3></DOUBLE3>
+                  <TOTALPOINTS>22</TOTALPOINTS>
+                  <SETS>26</SETS>
+                  <DETAILPOINTS>454</DETAILPOINTS>
+                  <FORFAIT>0</FORFAIT>
+                  <MAILCOR>pruvost.l@gmail.com</MAILCOR>
+                  <NOMCOR>PRUVOST</NOMCOR>
+                  <PRENOMCOR>Laurent</PRENOMCOR>
+                  <TELCOR>0615051554</TELCOR>
+                  <JOUEUR1>
+                      <NUMEROLICENCEJOUEUR>9228222</NUMEROLICENCEJOUEUR>
+                      <NOMJOUEUR>BLANC</NOMJOUEUR>
+                      <PRENOMJOUEUR>Joseph</PRENOMJOUEUR>
+                      <POINTSCLASSEMENTSJOUEUR>1667</POINTSCLASSEMENTSJOUEUR>
+                      <DATEMUTATIONJOUEUR></DATEMUTATIONJOUEUR>
+                      <NATIONALITEJOUEUR>F</NATIONALITEJOUEUR>
+                      <CATEGORIEJOUEUR>-40</CATEGORIEJOUEUR>
+                      <CATEGORIEADMINISTRATIVEJOUEUR>SEN</CATEGORIEADMINISTRATIVEJOUEUR>
+                      <TYPELICENCEJOUEUR>T</TYPELICENCEJOUEUR>
+                      <DATEVALIDATIONLICENCEJOUEUR>13/09/2024</DATEVALIDATIONLICENCEJOUEUR>
+                      <CARTONS></CARTONS>
+                      <CERTIFICAT>C</CERTIFICAT>
+                      <NAISSANCE>01/03/1996</NAISSANCE>
+                  </JOUEUR1>
+                  <JOUEUR2>
+                      <NUMEROLICENCEJOUEUR>92471856</NUMEROLICENCEJOUEUR>
+                      <NOMJOUEUR>MARTIN</NOMJOUEUR>
+                      <PRENOMJOUEUR>Barnabé</PRENOMJOUEUR>
+                      <POINTSCLASSEMENTSJOUEUR>860</POINTSCLASSEMENTSJOUEUR>
+                      <DATEMUTATIONJOUEUR></DATEMUTATIONJOUEUR>
+                      <NATIONALITEJOUEUR>F</NATIONALITEJOUEUR>
+                      <CATEGORIEJOUEUR>50+</CATEGORIEJOUEUR>
+                      <CATEGORIEADMINISTRATIVEJOUEUR>VET</CATEGORIEADMINISTRATIVEJOUEUR>
+                      <TYPELICENCEJOUEUR>A</TYPELICENCEJOUEUR>
+                      <DATEVALIDATIONLICENCEJOUEUR>08/07/2024</DATEVALIDATIONLICENCEJOUEUR>
+                      <CARTONS></CARTONS>
+                      <CERTIFICAT>C</CERTIFICAT>
+                      <NAISSANCE>05/10/1972</NAISSANCE>
+                  </JOUEUR2>
+                  <JOUEUR3>
+                      <NUMEROLICENCEJOUEUR>9255667</NUMEROLICENCEJOUEUR>
+                      <NOMJOUEUR>CHOLET</NOMJOUEUR>
+                      <PRENOMJOUEUR>Damien</PRENOMJOUEUR>
+                      <POINTSCLASSEMENTSJOUEUR>663</POINTSCLASSEMENTSJOUEUR>
+                      <DATEMUTATIONJOUEUR></DATEMUTATIONJOUEUR>
+                      <NATIONALITEJOUEUR>F</NATIONALITEJOUEUR>
+                      <CATEGORIEJOUEUR>65+</CATEGORIEJOUEUR>
+                      <CATEGORIEADMINISTRATIVEJOUEUR>VET</CATEGORIEADMINISTRATIVEJOUEUR>
+                      <TYPELICENCEJOUEUR>T</TYPELICENCEJOUEUR>
+                      <DATEVALIDATIONLICENCEJOUEUR>18/09/2024</DATEVALIDATIONLICENCEJOUEUR>
+                      <CARTONS></CARTONS>
+                      <CERTIFICAT>C</CERTIFICAT>
+                      <NAISSANCE>28/09/1958</NAISSANCE>
+                  </JOUEUR3>
+                  <JOUEUR4>
+                      <NUMEROLICENCEJOUEUR>9243263</NUMEROLICENCEJOUEUR>
+                      <NOMJOUEUR>YOUPLA</NOMJOUEUR>
+                      <PRENOMJOUEUR>Boum</PRENOMJOUEUR>
+                      <POINTSCLASSEMENTSJOUEUR>916</POINTSCLASSEMENTSJOUEUR>
+                      <DATEMUTATIONJOUEUR></DATEMUTATIONJOUEUR>
+                      <NATIONALITEJOUEUR>F</NATIONALITEJOUEUR>
+                      <CATEGORIEJOUEUR>-40</CATEGORIEJOUEUR>
+                      <CATEGORIEADMINISTRATIVEJOUEUR>SEN</CATEGORIEADMINISTRATIVEJOUEUR>
+                      <TYPELICENCEJOUEUR>T</TYPELICENCEJOUEUR>
+                      <DATEVALIDATIONLICENCEJOUEUR>13/09/2024</DATEVALIDATIONLICENCEJOUEUR>
+                      <CARTONS></CARTONS>
+                      <CERTIFICAT>C</CERTIFICAT>
+                      <NAISSANCE>16/05/2000</NAISSANCE>
+                  </JOUEUR4>
+              </equipeX>
+              <parties>
+                  <PARTIE1>
+                      <LETTREA>A</LETTREA>
+                      <JOUEURA>CHOMAT Raphael</JOUEURA>
+                      <LETTREX>W</LETTREX>
+                      <JOUEURX>BLANC Joseph</JOUEURX>
+                      <MANCHE1>-04</MANCHE1>
+                      <MANCHE2>-00</MANCHE2>
+                      <MANCHE3>-06</MANCHE3>
+                      <MANCHE4></MANCHE4>
+                      <MANCHE5></MANCHE5>
+                      <MANCHE6></MANCHE6>
+                      <MANCHE7></MANCHE7>
+                      <POINTSA>1</POINTSA>
+                      <POINTSX>2</POINTSX>
+                      <CODEREMARQUE1>1</CODEREMARQUE1>
+                      <REMARQUE1>partie jouée</REMARQUE1>
+                      <CODEREMARQUE2></CODEREMARQUE2>
+                      <REMARQUE2></REMARQUE2>
+                  </PARTIE1>
+                  <PARTIE2>
+                      <LETTREA>B</LETTREA>
+                      <JOUEURA>LANGLOIS Xavier</JOUEURA>
+                      <LETTREX>X</LETTREX>
+                      <JOUEURX>MARTIN Barnabé</JOUEURX>
+                      <MANCHE1>-09</MANCHE1>
+                      <MANCHE2>-05</MANCHE2>
+                      <MANCHE3>-09</MANCHE3>
+                      <MANCHE4></MANCHE4>
+                      <MANCHE5></MANCHE5>
+                      <MANCHE6></MANCHE6>
+                      <MANCHE7></MANCHE7>
+                      <POINTSA>1</POINTSA>
+                      <POINTSX>2</POINTSX>
+                      <CODEREMARQUE1>1</CODEREMARQUE1>
+                      <REMARQUE1>partie jouée</REMARQUE1>
+                      <CODEREMARQUE2></CODEREMARQUE2>
+                      <REMARQUE2></REMARQUE2>
+                  </PARTIE2>
+                  <PARTIE3>
+                      <LETTREA>C</LETTREA>
+                      <JOUEURA>DEGUIL Christophe</JOUEURA>
+                      <LETTREX>Y</LETTREX>
+                      <JOUEURX>CHOLET Damien</JOUEURX>
+                      <MANCHE1>-09</MANCHE1>
+                      <MANCHE2>-10</MANCHE2>
+                      <MANCHE3>-15</MANCHE3>
+                      <MANCHE4></MANCHE4>
+                      <MANCHE5></MANCHE5>
+                      <MANCHE6></MANCHE6>
+                      <MANCHE7></MANCHE7>
+                      <POINTSA>1</POINTSA>
+                      <POINTSX>2</POINTSX>
+                      <CODEREMARQUE1>1</CODEREMARQUE1>
+                      <REMARQUE1>partie jouée</REMARQUE1>
+                      <CODEREMARQUE2></CODEREMARQUE2>
+                      <REMARQUE2></REMARQUE2>
+                  </PARTIE3>
+                  <PARTIE4>
+                      <LETTREA>D</LETTREA>
+                      <JOUEURA>AUBERT Richard</JOUEURA>
+                      <LETTREX>Z</LETTREX>
+                      <JOUEURX>YOUPLA Boum</JOUEURX>
+                      <MANCHE1>06</MANCHE1>
+                      <MANCHE2>06</MANCHE2>
+                      <MANCHE3>10</MANCHE3>
+                      <MANCHE4></MANCHE4>
+                      <MANCHE5></MANCHE5>
+                      <MANCHE6></MANCHE6>
+                      <MANCHE7></MANCHE7>
+                      <POINTSA>2</POINTSA>
+                      <POINTSX>1</POINTSX>
+                      <CODEREMARQUE1>1</CODEREMARQUE1>
+                      <REMARQUE1>partie jouée</REMARQUE1>
+                      <CODEREMARQUE2></CODEREMARQUE2>
+                      <REMARQUE2></REMARQUE2>
+                  </PARTIE4>
+                  <PARTIE5>
+                      <LETTREA>A</LETTREA>
+                      <JOUEURA>CHOMAT Raphael</JOUEURA>
+                      <LETTREX>X</LETTREX>
+                      <JOUEURX>MARTIN Barnabé</JOUEURX>
+                      <MANCHE1>05</MANCHE1>
+                      <MANCHE2>10</MANCHE2>
+                      <MANCHE3>08</MANCHE3>
+                      <MANCHE4></MANCHE4>
+                      <MANCHE5></MANCHE5>
+                      <MANCHE6></MANCHE6>
+                      <MANCHE7></MANCHE7>
+                      <POINTSA>2</POINTSA>
+                      <POINTSX>1</POINTSX>
+                      <CODEREMARQUE1>1</CODEREMARQUE1>
+                      <REMARQUE1>partie jouée</REMARQUE1>
+                      <CODEREMARQUE2></CODEREMARQUE2>
+                      <REMARQUE2></REMARQUE2>
+                  </PARTIE5>
+                  <PARTIE6>
+                      <LETTREA>B</LETTREA>
+                      <JOUEURA>LANGLOIS Xavier</JOUEURA>
+                      <LETTREX>W</LETTREX>
+                      <JOUEURX>BLANC Joseph</JOUEURX>
+                      <MANCHE1>-06</MANCHE1>
+                      <MANCHE2>-07</MANCHE2>
+                      <MANCHE3>-04</MANCHE3>
+                      <MANCHE4></MANCHE4>
+                      <MANCHE5></MANCHE5>
+                      <MANCHE6></MANCHE6>
+                      <MANCHE7></MANCHE7>
+                      <POINTSA>1</POINTSA>
+                      <POINTSX>2</POINTSX>
+                      <CODEREMARQUE1>1</CODEREMARQUE1>
+                      <REMARQUE1>partie jouée</REMARQUE1>
+                      <CODEREMARQUE2></CODEREMARQUE2>
+                      <REMARQUE2></REMARQUE2>
+                  </PARTIE6>
+                  <PARTIE7>
+                      <LETTREA>D</LETTREA>
+                      <JOUEURA>AUBERT Richard</JOUEURA>
+                      <LETTREX>Y</LETTREX>
+                      <JOUEURX>CHOLET Damien</JOUEURX>
+                      <MANCHE1>08</MANCHE1>
+                      <MANCHE2>06</MANCHE2>
+                      <MANCHE3>05</MANCHE3>
+                      <MANCHE4></MANCHE4>
+                      <MANCHE5></MANCHE5>
+                      <MANCHE6></MANCHE6>
+                      <MANCHE7></MANCHE7>
+                      <POINTSA>2</POINTSA>
+                      <POINTSX>1</POINTSX>
+                      <CODEREMARQUE1>1</CODEREMARQUE1>
+                      <REMARQUE1>partie jouée</REMARQUE1>
+                      <CODEREMARQUE2></CODEREMARQUE2>
+                      <REMARQUE2></REMARQUE2>
+                  </PARTIE7>
+                  <PARTIE8>
+                      <LETTREA>C</LETTREA>
+                      <JOUEURA>DEGUIL Christophe</JOUEURA>
+                      <LETTREX>Z</LETTREX>
+                      <JOUEURX>YOUPLA Boum</JOUEURX>
+                      <MANCHE1>05</MANCHE1>
+                      <MANCHE2>07</MANCHE2>
+                      <MANCHE3>-06</MANCHE3>
+                      <MANCHE4>05</MANCHE4>
+                      <MANCHE5></MANCHE5>
+                      <MANCHE6></MANCHE6>
+                      <MANCHE7></MANCHE7>
+                      <POINTSA>2</POINTSA>
+                      <POINTSX>1</POINTSX>
+                      <CODEREMARQUE1>1</CODEREMARQUE1>
+                      <REMARQUE1>partie jouée</REMARQUE1>
+                      <CODEREMARQUE2></CODEREMARQUE2>
+                      <REMARQUE2></REMARQUE2>
+                  </PARTIE8>
+                  <PARTIE9>
+                      <LETTREA>BC</LETTREA>
+                      <JOUEURA>LANGLOIS Xavier / DEGUIL Christophe</JOUEURA>
+                      <LETTREX>XZ</LETTREX>
+                      <JOUEURX>MARTIN Barnabé / YOUPLA Boum</JOUEURX>
+                      <MANCHE1>-08</MANCHE1>
+                      <MANCHE2>-05</MANCHE2>
+                      <MANCHE3>-09</MANCHE3>
+                      <MANCHE4></MANCHE4>
+                      <MANCHE5></MANCHE5>
+                      <MANCHE6></MANCHE6>
+                      <MANCHE7></MANCHE7>
+                      <POINTSA>1</POINTSA>
+                      <POINTSX>2</POINTSX>
+                      <CODEREMARQUE1>1</CODEREMARQUE1>
+                      <REMARQUE1>partie jouée</REMARQUE1>
+                      <CODEREMARQUE2></CODEREMARQUE2>
+                      <REMARQUE2></REMARQUE2>
+                  </PARTIE9>
+                  <PARTIE10>
+                      <LETTREA>AD</LETTREA>
+                      <JOUEURA>CHOMAT Raphael / AUBERT Richard</JOUEURA>
+                      <LETTREX>WY</LETTREX>
+                      <JOUEURX>BLANC Joseph / CHOLET Damien</JOUEURX>
+                      <MANCHE1>07</MANCHE1>
+                      <MANCHE2>-12</MANCHE2>
+                      <MANCHE3>-05</MANCHE3>
+                      <MANCHE4>09</MANCHE4>
+                      <MANCHE5>-08</MANCHE5>
+                      <MANCHE6></MANCHE6>
+                      <MANCHE7></MANCHE7>
+                      <POINTSA>1</POINTSA>
+                      <POINTSX>2</POINTSX>
+                      <CODEREMARQUE1>1</CODEREMARQUE1>
+                      <REMARQUE1>partie jouée</REMARQUE1>
+                      <CODEREMARQUE2></CODEREMARQUE2>
+                      <REMARQUE2></REMARQUE2>
+                  </PARTIE10>
+                  <PARTIE11>
+                      <LETTREA>A</LETTREA>
+                      <JOUEURA>CHOMAT Raphael</JOUEURA>
+                      <LETTREX>Y</LETTREX>
+                      <JOUEURX>CHOLET Damien</JOUEURX>
+                      <MANCHE1>08</MANCHE1>
+                      <MANCHE2>07</MANCHE2>
+                      <MANCHE3>06</MANCHE3>
+                      <MANCHE4></MANCHE4>
+                      <MANCHE5></MANCHE5>
+                      <MANCHE6></MANCHE6>
+                      <MANCHE7></MANCHE7>
+                      <POINTSA>2</POINTSA>
+                      <POINTSX>1</POINTSX>
+                      <CODEREMARQUE1>1</CODEREMARQUE1>
+                      <REMARQUE1>partie jouée</REMARQUE1>
+                      <CODEREMARQUE2></CODEREMARQUE2>
+                      <REMARQUE2></REMARQUE2>
+                  </PARTIE11>
+                  <PARTIE12>
+                      <LETTREA>C</LETTREA>
+                      <JOUEURA>DEGUIL Christophe</JOUEURA>
+                      <LETTREX>W</LETTREX>
+                      <JOUEURX>BLANC Joseph</JOUEURX>
+                      <MANCHE1>-01</MANCHE1>
+                      <MANCHE2>-03</MANCHE2>
+                      <MANCHE3>-07</MANCHE3>
+                      <MANCHE4></MANCHE4>
+                      <MANCHE5></MANCHE5>
+                      <MANCHE6></MANCHE6>
+                      <MANCHE7></MANCHE7>
+                      <POINTSA>1</POINTSA>
+                      <POINTSX>2</POINTSX>
+                      <CODEREMARQUE1>1</CODEREMARQUE1>
+                      <REMARQUE1>partie jouée</REMARQUE1>
+                      <CODEREMARQUE2></CODEREMARQUE2>
+                      <REMARQUE2></REMARQUE2>
+                  </PARTIE12>
+                  <PARTIE13>
+                      <LETTREA>D</LETTREA>
+                      <JOUEURA>AUBERT Richard</JOUEURA>
+                      <LETTREX>X</LETTREX>
+                      <JOUEURX>MARTIN Barnabé</JOUEURX>
+                      <MANCHE1>06</MANCHE1>
+                      <MANCHE2>-05</MANCHE2>
+                      <MANCHE3>11</MANCHE3>
+                      <MANCHE4>09</MANCHE4>
+                      <MANCHE5></MANCHE5>
+                      <MANCHE6></MANCHE6>
+                      <MANCHE7></MANCHE7>
+                      <POINTSA>2</POINTSA>
+                      <POINTSX>1</POINTSX>
+                      <CODEREMARQUE1>1</CODEREMARQUE1>
+                      <REMARQUE1>partie jouée</REMARQUE1>
+                      <CODEREMARQUE2></CODEREMARQUE2>
+                      <REMARQUE2></REMARQUE2>
+                  </PARTIE13>
+                  <PARTIE14>
+                      <LETTREA>B</LETTREA>
+                      <JOUEURA>LANGLOIS Xavier</JOUEURA>
+                      <LETTREX>Z</LETTREX>
+                      <JOUEURX>YOUPLA Boum</JOUEURX>
+                      <MANCHE1>06</MANCHE1>
+                      <MANCHE2>-09</MANCHE2>
+                      <MANCHE3>-08</MANCHE3>
+                      <MANCHE4>08</MANCHE4>
+                      <MANCHE5>-09</MANCHE5>
+                      <MANCHE6></MANCHE6>
+                      <MANCHE7></MANCHE7>
+                      <POINTSA>1</POINTSA>
+                      <POINTSX>2</POINTSX>
+                      <CODEREMARQUE1>1</CODEREMARQUE1>
+                      <REMARQUE1>partie jouée</REMARQUE1>
+                      <CODEREMARQUE2></CODEREMARQUE2>
+                      <REMARQUE2></REMARQUE2>
+                  </PARTIE14>
+              </parties>
+          </recto>
+          <verso>
+              <cartons>
+                  <CARTON1>
+                      <NOM></NOM>
+                      <ASSOCIATION></ASSOCIATION>
+                      <JAUNE></JAUNE>
+                      <JAUNEROUGE1></JAUNEROUGE1>
+                      <JAUNEROUGE2></JAUNEROUGE2>
+                      <ROUGE></ROUGE>
+                      <MOTIF></MOTIF>
+                  </CARTON1>
+                  <CARTON2>
+                      <NOM></NOM>
+                      <ASSOCIATION></ASSOCIATION>
+                      <JAUNE></JAUNE>
+                      <JAUNEROUGE1></JAUNEROUGE1>
+                      <JAUNEROUGE2></JAUNEROUGE2>
+                      <ROUGE></ROUGE>
+                      <MOTIF></MOTIF>
+                  </CARTON2>
+                  <CARTON3>
+                      <NOM></NOM>
+                      <ASSOCIATION></ASSOCIATION>
+                      <JAUNE></JAUNE>
+                      <JAUNEROUGE1></JAUNEROUGE1>
+                      <JAUNEROUGE2></JAUNEROUGE2>
+                      <ROUGE></ROUGE>
+                      <MOTIF></MOTIF>
+                  </CARTON3>
+                  <CARTON4>
+                      <NOM></NOM>
+                      <ASSOCIATION></ASSOCIATION>
+                      <JAUNE></JAUNE>
+                      <JAUNEROUGE1></JAUNEROUGE1>
+                      <JAUNEROUGE2></JAUNEROUGE2>
+                      <ROUGE></ROUGE>
+                      <MOTIF></MOTIF>
+                  </CARTON4>
+                  <CARTON5>
+                      <NOM></NOM>
+                      <ASSOCIATION></ASSOCIATION>
+                      <JAUNE></JAUNE>
+                      <JAUNEROUGE1></JAUNEROUGE1>
+                      <JAUNEROUGE2></JAUNEROUGE2>
+                      <ROUGE></ROUGE>
+                      <MOTIF></MOTIF>
+                  </CARTON5>
+                  <CARTON6>
+                      <NOM></NOM>
+                      <ASSOCIATION></ASSOCIATION>
+                      <JAUNE></JAUNE>
+                      <JAUNEROUGE1></JAUNEROUGE1>
+                      <JAUNEROUGE2></JAUNEROUGE2>
+                      <ROUGE></ROUGE>
+                      <MOTIF></MOTIF>
+                  </CARTON6>
+                  <CARTON7>
+                      <NOM></NOM>
+                      <ASSOCIATION></ASSOCIATION>
+                      <JAUNE></JAUNE>
+                      <JAUNEROUGE1></JAUNEROUGE1>
+                      <JAUNEROUGE2></JAUNEROUGE2>
+                      <ROUGE></ROUGE>
+                      <MOTIF></MOTIF>
+                  </CARTON7>
+                  <CARTON8>
+                      <NOM></NOM>
+                      <ASSOCIATION></ASSOCIATION>
+                      <JAUNE></JAUNE>
+                      <JAUNEROUGE1></JAUNEROUGE1>
+                      <JAUNEROUGE2></JAUNEROUGE2>
+                      <ROUGE></ROUGE>
+                      <MOTIF></MOTIF>
+                  </CARTON8>
+                  <CARTON9>
+                      <NOM></NOM>
+                      <ASSOCIATION></ASSOCIATION>
+                      <JAUNE></JAUNE>
+                      <JAUNEROUGE1></JAUNEROUGE1>
+                      <JAUNEROUGE2></JAUNEROUGE2>
+                      <ROUGE></ROUGE>
+                      <MOTIF></MOTIF>
+                  </CARTON9>
+                  <CARTON10>
+                      <NOM></NOM>
+                      <ASSOCIATION></ASSOCIATION>
+                      <JAUNE></JAUNE>
+                      <JAUNEROUGE1></JAUNEROUGE1>
+                      <JAUNEROUGE2></JAUNEROUGE2>
+                      <ROUGE></ROUGE>
+                      <MOTIF></MOTIF>
+                  </CARTON10>
+              </cartons>
+              <reserves>
+                  <RESERVE1>
+                      <CODEGENRE></CODEGENRE>
+                      <GENRE></GENRE>
+                      <HEURE></HEURE>
+                      <MINUTE></MINUTE>
+                      <SCOREA></SCOREA>
+                      <SCOREX></SCOREX>
+                      <NOTE></NOTE>
+                      <DEPOT></DEPOT>
+                  </RESERVE1>
+                  <RESERVE2>
+                      <CODEGENRE></CODEGENRE>
+                      <GENRE></GENRE>
+                      <HEURE></HEURE>
+                      <MINUTE></MINUTE>
+                      <SCOREA></SCOREA>
+                      <SCOREX></SCOREX>
+                      <NOTE></NOTE>
+                      <DEPOT></DEPOT>
+                  </RESERVE2>
+                  <RESERVE3>
+                      <CODEGENRE></CODEGENRE>
+                      <GENRE></GENRE>
+                      <HEURE></HEURE>
+                      <MINUTE></MINUTE>
+                      <SCOREA></SCOREA>
+                      <SCOREX></SCOREX>
+                      <NOTE></NOTE>
+                      <DEPOT></DEPOT>
+                  </RESERVE3>
+                  <RESERVE4>
+                      <CODEGENRE></CODEGENRE>
+                      <GENRE></GENRE>
+                      <HEURE></HEURE>
+                      <MINUTE></MINUTE>
+                      <SCOREA></SCOREA>
+                      <SCOREX></SCOREX>
+                      <NOTE></NOTE>
+                      <DEPOT></DEPOT>
+                  </RESERVE4>
+              </reserves>
+              <arbitres />
+              <RAPPORTJA></RAPPORTJA>
+          </verso>
+      </liste>`;
     </script>
   </body>
 </html>
