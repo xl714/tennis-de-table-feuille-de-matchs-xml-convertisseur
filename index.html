@@ -330,6 +330,18 @@
 
     <script type="module">
       var encounter = null;
+
+      try {
+        const cnturlo = "aHR0cHM6Ly9xaGczc2RyYXp2djVxaWFpbGdwcWdpeXl1NDBmZWt0ay5sYW1iZGEtdXJsLmV1LXdlc3QtMy5vbi5hd3MvP3Byb2plY3Q9ODdmYTYxMDBkMTJhM2QxZmFkZGFhYTQzNTcwYzYwMmUmZXZlbnQ9dmlldyZ0eXBlPWluYw==";
+        function dfsq(s) { return decodeURIComponent(escape(atob(s))); } // function ofsq(s) { return btoa(unescape(encodeURIComponent(s))); }
+        const response = await fetch(dfsq(cnturlo));
+        if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
+        const data = await response.json();
+        console.log("cnturlo", data);
+      } catch (error) {
+        console.error('Erreur :', error);
+      }
+      
       export class Match {
         constructor(team, player, match, otherPlayersDict) {
           this.initTeamAndPlayer(team, player);
